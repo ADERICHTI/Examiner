@@ -7,7 +7,7 @@ import { auth, setUser, db, doc, getDoc, onSnapshot, serverTimestamp, setResult 
 // Application State
 const state = {
     selectedSubjects: [],
-    testDuration: 15, // in minutes
+    testDuration: 10, // in minutes
     currentSubject: null,
     currentQuestionIndex: 0,
     userAnswers: {},
