@@ -235,7 +235,16 @@ onAuthStateChanged(auth, async (user) => {
 
     try {
       
-      localStorage.setItem('localUserProfile', JSON.stringify({...JSON.parse((localStorage.getItem('localUserProfile'))), takenTests: JSON.parse((localStorage.getItem('localUserProfile'))).takenTests || false}))
+      try {
+   
+        localStorage.setItem('localUserProfile', JSON.stringify({...JSON.parse((localStorage.getItem('localUserProfile'))), takenTests: JSON.parse((localStorage.getItem('localUserProfile'))).takenTests || false}))
+        
+      } catch (error) {
+  
+        localStorage.setItem('localUserProfile', JSON.stringify({...JSON.parse((localStorage.getItem('localUserProfile'))), takenTests: false}))
+        console.log(error);
+        
+      }
   
       const override = () =>{
         localStorage.setItem('localUserProfile', JSON.stringify({...JSON.parse((localStorage.getItem('localUserProfile'))), takenTests: userProfile.takenTests}));
@@ -251,6 +260,7 @@ onAuthStateChanged(auth, async (user) => {
       userProfile.override ? override() : JSON.parse(localStorage.getItem('localUserProfile')).takenTests || false;
       
     } catch (error) {
+      console.log(error);
       
     }
     
