@@ -233,7 +233,6 @@ onAuthStateChanged(auth, async (user) => {
     const savedProfile = await getDoc(doc(db, 'clients', user.uid));
     const userProfile = savedProfile.data() || {};
 
-    try {
       
       try {
    
@@ -258,11 +257,7 @@ onAuthStateChanged(auth, async (user) => {
       const hasTakenTest = userProfile.takenTests === JSON.parse(localStorage.getItem('localUserProfile')).takenTests ? JSON.parse(localStorage.getItem('localUserProfile')).takenTests 
       : 
       userProfile.override ? override() : JSON.parse(localStorage.getItem('localUserProfile')).takenTests || false;
-      
-    } catch (error) {
-      console.log(error);
-      
-    }
+
     
     // User signed in
     setupUserProfile(user);
