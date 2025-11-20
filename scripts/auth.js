@@ -233,7 +233,7 @@ onAuthStateChanged(auth, async (user) => {
     const savedProfile = await getDoc(doc(db, 'clients', user.uid));
     const userProfile = savedProfile.data() || {};
 
-    localStorage.setItem('localUserProfile', JSON.stringify({...JSON.parse((localStorage.getItem('localUserProfile'))), takenTests: JSON.parse((localStorage.getItem('localUserProfile'))).takenTests || userProfile.takenTests || false}))
+    localStorage.setItem('localUserProfile', JSON.stringify({...JSON.parse((localStorage.getItem('localUserProfile'))), takenTests: JSON.parse((localStorage.getItem('localUserProfile'))).takenTests || false}))
 
     const override = () =>{
       localStorage.setItem('localUserProfile', JSON.stringify({...JSON.parse((localStorage.getItem('localUserProfile'))), takenTests: userProfile.takenTests}));
