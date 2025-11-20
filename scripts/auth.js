@@ -229,7 +229,7 @@ onAuthStateChanged(auth, async (user) => {
   window.currentUser = user;
   if (user) {
     // console.log(user);
-    
+    localStorage.setItem('localUserID', 'null');
     const savedProfile = await getDoc(doc(db, 'clients', user.uid));
     const userProfile = savedProfile.data() || {};
 
@@ -252,9 +252,12 @@ onAuthStateChanged(auth, async (user) => {
       };
   
       // console.log('takenTests[DB, LocalStorage]: ', userProfile.takenTests, JSON.parse(localStorage.getItem('localUserProfile')).takenTests);
-  
+      console.log(localStorage.getItem('localUserID'));
+      
       const hasTakenTest = userProfile.takenTests === JSON.parse(localStorage.getItem('localUserProfile')).takenTests ? JSON.parse(localStorage.getItem('localUserProfile')).takenTests 
       : 
+      localStorage.getItem('localUserID') === 'null' ? userProfile.takenTests || false
+      :
       userProfile.override ? override() : JSON.parse(localStorage.getItem('localUserProfile')).takenTests || false;
 
     
