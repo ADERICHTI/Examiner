@@ -1,4 +1,5 @@
 import { setGreeting, loadUserProfile, showMessage, getRandomInteger, switchInterface } from "./app.js";
+import { testConnection, addData, readData, updateData, addIfNotExists } from "./extra.js";
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { 
@@ -27,14 +28,13 @@ import {
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyA1PaZu6BZb0mTSbBLe97XPj8U06uUPkOw",
-  authDomain: "quick-cbt.firebaseapp.com",
-  databaseURL: "https://quick-cbt-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "quick-cbt",
-  storageBucket: "quick-cbt.firebasestorage.app",
-  messagingSenderId: "584031052691",
-  appId: "1:584031052691:web:1ebe9661f5700306af7e66",
-  measurementId: "G-3P1KVPB7FB"
+    apiKey: "AIzaSyBR2IsZYefv54lABlgF4QB9RsRKUpLaPuo",
+    authDomain: "examiner-25.firebaseapp.com",
+    projectId: "examiner-25",
+    storageBucket: "examiner-25.firebasestorage.app",
+    messagingSenderId: "414665642672",
+    appId: "1:414665642672:web:7ee296a2fffdd51208a175",
+    measurementId: "G-H0432JGGD9"
 };
 
 // Initialize Firebase
@@ -75,169 +75,189 @@ async function setUser(userid, userData, collection='clients') {
 }
 
 // get or create results document for the user / also initialize if not exists
-async function setResult(data={}, mode='confirm') {
-    // alert('Mode: ' + mode);
-    switch (mode) {
-      case 'write':
-        // alert('Writing results doc');  
-        const resultData = await getDoc(doc(db, 'results', auth.currentUser.uid));
-            if (resultData.exists()) {
-                // alert('Results doc exists, not overwriting');
-                // get existing data and update
-                let existingData = resultData.data();
-                // update timeFirstTestTaken if it's 0
-                existingData.timeFirstTestTaken = existingData.timeFirstTestTaken === 0 ? serverTimestamp() : existingData.timeFirstTestTaken;
-                // update timeLastTestTaken
-                existingData.timeLastTestTaken = serverTimestamp();
-                // update testResults-subjectScores
-                existingData.testResults.subjectScores = {...existingData.testResults.subjectScores, ...data.testResults.subjectScores};
-                // update totalTestsTaken
-                existingData.totalTestsTaken = parseInt(Object.keys(existingData.testResults.subjectScores).length);
-                // update testResults-totalScore
-                existingData.testResults.totalScore = 0;
-                Object.keys(existingData.testResults.subjectScores).forEach(subject => {
-                    existingData.testResults.totalScore += existingData.testResults.subjectScores[subject].correct;
-                })
+// async function setResult(data={}, mode='confirm') {
+//     // alert('Mode: ' + mode);
+//     switch (mode) {
+//       case 'write':
+//         // alert('Writing results doc');  
+//         const resultData = await getDoc(doc(db, 'results', auth.currentUser.uid));
+//             if (resultData.exists()) {
+//                 // alert('Results doc exists, not overwriting');
+//                 // get existing data and update
+//                 let existingData = resultData.data();
+//                 // update timeFirstTestTaken if it's 0
+//                 existingData.timeFirstTestTaken = existingData.timeFirstTestTaken === 0 ? serverTimestamp() : existingData.timeFirstTestTaken;
+//                 // update timeLastTestTaken
+//                 existingData.timeLastTestTaken = serverTimestamp();
+//                 // update testResults-subjectScores
+//                 existingData.testResults.subjectScores = {...existingData.testResults.subjectScores, ...data.testResults.subjectScores};
+//                 // update totalTestsTaken
+//                 existingData.totalTestsTaken = parseInt(Object.keys(existingData.testResults.subjectScores).length);
+//                 // update testResults-totalScore
+//                 existingData.testResults.totalScore = 0;
+//                 Object.keys(existingData.testResults.subjectScores).forEach(subject => {
+//                     existingData.testResults.totalScore += existingData.testResults.subjectScores[subject].correct;
+//                 })
 
-                // const alpha = 0.3;
-                // // update metric
-                // existingData.metric = (alpha * parseInt(existingData.testResults.totalScore)/(25*parseInt(existingData.totalTestsTaken))* 100) + ((1 - alpha) * (existingData.metric || 0));
-                function computeUpdatedMetric(previousMetric, newCorrect, questionsPerTest = 25, testsCount = 1, alpha = 0.3) {
-                  // normalize to 0..1
-                  const denom = Math.max(1, questionsPerTest * testsCount); // avoid divide-by-zero
-                  const newScorePct = (Number(newCorrect) || 0) / denom; // 0..1
-                  // if no previous metric, initialize to newScorePct
-                  if (previousMetric == null || isNaN(previousMetric)) return Math.round(newScorePct * 100);
-                  // standard EMA update
-                  const updated = previousMetric + alpha * (newScorePct * 100 - previousMetric);
-                  return Math.round(updated);
-                }
-                // ...existing code...
-                // Example usage inside setResult write branch (replace current metric update):
-                const prevMetric = existingData.metric || null;
-                const totalCorrect = parseInt(existingData.testResults.totalScore || 0, 10);
-                const totalTests = Math.max(1, parseInt(existingData.totalTestsTaken || 1, 10));
-                existingData.metric = computeUpdatedMetric(prevMetric, totalCorrect, 25, totalTests, 0.3);
-                // write back to firestore
-                await setDoc(doc(db, 'results', auth.currentUser.uid), existingData, { merge: true });
-                // alert('Results doc overwritten');
-            };         
-            break;
-      case 'read':
-          // alert('Reading result doc...')
-          const getResultData = await onSnapshot(doc(db, 'results', auth.currentUser.uid), (data) => {
-            if (data.exists()) {
-              let newData = {};
+//                 // const alpha = 0.3;
+//                 // // update metric
+//                 // existingData.metric = (alpha * parseInt(existingData.testResults.totalScore)/(25*parseInt(existingData.totalTestsTaken))* 100) + ((1 - alpha) * (existingData.metric || 0));
+//                 function computeUpdatedMetric(previousMetric, newCorrect, questionsPerTest = 25, testsCount = 1, alpha = 0.3) {
+//                   // normalize to 0..1
+//                   const denom = Math.max(1, questionsPerTest * testsCount); // avoid divide-by-zero
+//                   const newScorePct = (Number(newCorrect) || 0) / denom; // 0..1
+//                   // if no previous metric, initialize to newScorePct
+//                   if (previousMetric == null || isNaN(previousMetric)) return Math.round(newScorePct * 100);
+//                   // standard EMA update
+//                   const updated = previousMetric + alpha * (newScorePct * 100 - previousMetric);
+//                   return Math.round(updated);
+//                 }
+//                 // ...existing code...
+//                 // Example usage inside setResult write branch (replace current metric update):
+//                 const prevMetric = existingData.metric || null;
+//                 const totalCorrect = parseInt(existingData.testResults.totalScore || 0, 10);
+//                 const totalTests = Math.max(1, parseInt(existingData.totalTestsTaken || 1, 10));
+//                 existingData.metric = computeUpdatedMetric(prevMetric, totalCorrect, 25, totalTests, 0.3);
+//                 // write back to firestore
+//                 await setDoc(doc(db, 'results', auth.currentUser.uid), existingData, { merge: true });
+//                 // alert('Results doc overwritten');
+//             };         
+//             break;
+//       case 'read':
+//           // alert('Reading result doc...')
+//           const getResultData = await onSnapshot(doc(db, 'results', auth.currentUser.uid), (data) => {
+//             if (data.exists()) {
+//               let newData = {};
   
-              Object.keys(data.data().testResults.subjectScores).forEach(subject => {
-                  newData[subject] = data.data().testResults.subjectScores[subject].correct;
-              });
+//               Object.keys(data.data().testResults.subjectScores).forEach(subject => {
+//                   newData[subject] = data.data().testResults.subjectScores[subject].correct;
+//               });
   
-              newData['residual'] = 25 * data.data().totalTestsTaken - data.data().testResults.totalScore;
-              // alert(`new data has been produced: ${JSON.stringify(newData)}`)
-              console.log(newData);
+//               newData['residual'] = 25 * data.data().totalTestsTaken - data.data().testResults.totalScore;
+//               // alert(`new data has been produced: ${JSON.stringify(newData)}`)
+//               console.log(newData);
               
-              return newData;
-            }
-          })
-          break;
-        case 'confirm':
-            // alert('Checking results doc');
-            try {
-                const docSnap = await getDoc(doc(db, 'results', auth.currentUser.uid));
+//               return newData;
+//             }
+//           })
+//           break;
+//         case 'confirm':
+//             // alert('Checking results doc');
+//             try {
+//                 const docSnap = await getDoc(doc(db, 'results', auth.currentUser.uid));
                 
-                if (!docSnap.exists()) {
-                    // alert('No results doc found');
+//                 if (!docSnap.exists()) {
+//                     // alert('No results doc found');
                     
-                    await setDoc(doc(db, 'results', auth.currentUser.uid), {
-                        timeFirstTestTaken: 0,
-                        timeLastTestTaken: 0,
-                        totalTestsTaken: 0,
-                        testResults: {
-                            subjectScores: {},
-                            totalScore: 0
-                        }
-                    });
+//                     await setDoc(doc(db, 'results', auth.currentUser.uid), {
+//                         timeFirstTestTaken: 0,
+//                         timeLastTestTaken: 0,
+//                         totalTestsTaken: 0,
+//                         testResults: {
+//                             subjectScores: {},
+//                             totalScore: 0
+//                         }
+//                     });
                     
-                    // alert('Results doc created');
-                } else {
-                    // alert('it exists');
-                }
-            } catch (error) {
-                console.error('Error checking/creating results doc:', error);
-            }
-            break;
-        default:
-            break;
-    }
-}
+//                     // alert('Results doc created');
+//                 } else {
+//                     // alert('it exists');
+//                 }
+//             } catch (error) {
+//                 console.error('Error checking/creating results doc:', error);
+//             }
+//             break;
+//         default:
+//             break;
+//     }
+// }
 
 let activityTimeout;
 
-function trackUserActivity() {
-  const events = ['mousemove', 'keydown', 'scroll', 'click', 'touchstart'];
+// function trackUserActivity() {
+//   const events = ['mousemove', 'keydown', 'scroll', 'click', 'touchstart'];
   
-  events.forEach(event => {
-    window.addEventListener(event, updateLastActive, { passive: true });
-  });
+//   events.forEach(event => {
+//     window.addEventListener(event, updateLastActive, { passive: true });
+//   });
 
-  // Track when user switches tabs/minimizes window
-    document.addEventListener('visibilitychange', () => {
-        if (document.hidden) {
-            updateUserStatus('away');
-        } else {
-            updateUserStatus('online');
-        }
-    });
-}
+//   // Track when user switches tabs/minimizes window
+//     document.addEventListener('visibilitychange', () => {
+//         if (document.hidden) {
+//             updateUserStatus('away');
+//         } else {
+//             updateUserStatus('online');
+//         }
+//     });
+// }
 
-function updateLastActive() {
-  // Clear existing timeout
-  clearTimeout(activityTimeout);
+// function updateLastActive() {
+//   // Clear existing timeout
+//   clearTimeout(activityTimeout);
   
-  // Update immediately
-  updateUserStatus('online');
+//   // Update immediately
+//   updateUserStatus('online');
   
-  // Set timeout for offline status (e.g., 30 seconds of inactivity)
-  activityTimeout = setTimeout(() => {
-    updateUserStatus('offline');
-}, 30000);
-}
+//   // Set timeout for offline status (e.g., 30 seconds of inactivity)
+//   activityTimeout = setTimeout(() => {
+//     updateUserStatus('offline');
+// }, 30000);
+// }
 
-async function updateUserStatus(status) {
-    currentUser = auth.currentUser;
-    if (!currentUser) return;
+// async function updateUserStatus(status) {
+//     currentUser = auth.currentUser;
+//     if (!currentUser) return;
     
-    try {
-        await setDoc(doc(db, "users", currentUser.uid), {
-        status: status,
-        lastActive: serverTimestamp(),
-        ...(status === 'online' && { isOnline: true }),
-        ...(status === 'offline' && { isOnline: false })
-        }, { merge: true });
-    } catch (error) {
-        console.log("Error updating status:", error);
-    }
-}
+//     try {
+//         await setDoc(doc(db, "users", currentUser.uid), {
+//         status: status,
+//         lastActive: serverTimestamp(),
+//         ...(status === 'online' && { isOnline: true }),
+//         ...(status === 'offline' && { isOnline: false })
+//         }, { merge: true });
+//     } catch (error) {
+//         console.log("Error updating status:", error);
+//     }
+// }
 
 
 
 // const user = auth.currentUser;
 // Auth State Management
+
 onAuthStateChanged(auth, async (user) => {
   window.currentUser = user;
   if (user) {
+    console.log(user);
+    
     const savedProfile = await getDoc(doc(db, 'clients', user.uid));
     const userProfile = savedProfile.data() || {};
+
+    localStorage.setItem('localUserProfile', JSON.stringify({...JSON.parse((localStorage.getItem('localUserProfile'))), takenTests: JSON.parse((localStorage.getItem('localUserProfile'))).takenTests || userProfile.takenTests || false}))
+
+    const override = () =>{
+      localStorage.setItem('localUserProfile', JSON.stringify({...JSON.parse((localStorage.getItem('localUserProfile'))), takenTests: userProfile.takenTests}));
+      alert('it was me');
+      
+      return userProfile.takenTests;
+    };
+
+    console.log('takenTests[DB, LocalStorage]: ', userProfile.takenTests, JSON.parse(localStorage.getItem('localUserProfile')).takenTests);
+
+    const hasTakenTest = userProfile.takenTests === JSON.parse(localStorage.getItem('localUserProfile')).takenTests ? JSON.parse(localStorage.getItem('localUserProfile')).takenTests 
+    : 
+    userProfile.override ? override() : JSON.parse(localStorage.getItem('localUserProfile')).takenTests;
+    
+    
     // User signed in
     setupUserProfile(user);
     hideAuthModal();
-    try {
-       setResult();
-    } catch (error) {
-        console.log(error);
+    // try {
+    //    setResult();
+    // } catch (error) {
+    //     console.log(error);
         
-    }
+    // }
 
     function isDateToday(timestamp) {
       if (!timestamp) return false;
@@ -263,10 +283,24 @@ onAuthStateChanged(auth, async (user) => {
       takenTests: userProfile.takenTests || false,
     //   history: [],
       signInAt: serverTimestamp(),
-      lastActive: serverTimestamp()
+      lastActive: serverTimestamp(),
+      override: false,
     });
 
-    if (userProfile.takenTests === true) {
+    const localUserProfile = JSON.parse(localStorage.getItem('localUserProfile')) || {};
+
+    addIfNotExists({
+      username: user.displayName,
+      email: user.email,
+      user_id: user.uid,
+      name: localUserProfile.name || '',
+      matricno: localUserProfile.matricno || '',
+      department: localUserProfile.department || '',
+      faculty: localUserProfile.faculty || '',
+      scores: localUserProfile.scores || [], // score in percentage
+    })
+
+    if (hasTakenTest === true) {
       const row = document.createElement('tr');
       row.innerHTML = `
           <td>${"EME 127"}</td>
@@ -314,8 +348,8 @@ onAuthStateChanged(auth, async (user) => {
     //         document.getElementById('messageDialogContent').style.animation = 'none';
     //     }, 15000);
     // })
-    trackUserActivity();
-    updateUserStatus('online');
+    // trackUserActivity();
+    // updateUserStatus('online');
     // CONSIDER!!!!!!!
     // if (!savedProfile.exists()) {
     //   showMessage('Welcome to StudyPiece! Please complete your profile information. click yes now to edit your details for better experience', 'prompt', () => {
@@ -333,8 +367,8 @@ onAuthStateChanged(auth, async (user) => {
 } else {
     // User signed out
     // hideUserProfile();
-    showAuthModal();
-    updateUserStatus('offline');
+    // showAuthModal();
+    // updateUserStatus('offline');
   }
 });
 
@@ -389,7 +423,9 @@ function hideAuthModal() {
   elements.authModal.classList.add('hidden');
   }
 
-export { auth, setUser, doc, db, getDoc, onSnapshot, serverTimestamp, setResult, getAuth, 
+// export { auth, setUser, doc, db, getDoc, onSnapshot, serverTimestamp, setResult, getAuth, 
+// export { auth, setUser, doc, db, getDoc, serverTimestamp, setResult, getAuth, 
+export { auth, setUser, doc, db, getDoc, serverTimestamp, getAuth, 
   GoogleAuthProvider, 
   signInWithPopup, 
   onAuthStateChanged, initializeApp };

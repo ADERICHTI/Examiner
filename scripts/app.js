@@ -2,12 +2,16 @@ import {
     signOut
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-import { auth, setUser, db, doc, getDoc, onSnapshot, serverTimestamp, setResult } from "./auth.js";
+import { testConnection, addData, readData, updateData, addIfNotExists } from "./extra.js";
+testConnection()
+// import { auth, setUser, db, doc, getDoc, onSnapshot, serverTimestamp, setResult } from "./auth.js";
+// import { auth, setUser, db, doc, getDoc, serverTimestamp, setResult } from "./auth.js";
+import { auth, setUser, db, doc, getDoc, serverTimestamp } from "./auth.js";
 
 // Application State
 const state = {
     selectedSubjects: [],
-    testDuration: 10, // in minutes
+    testDuration: 15, // in minutes
     currentSubject: null,
     currentQuestionIndex: 0,
     userAnswers: {},
@@ -297,8 +301,8 @@ async function loadUserProfile() {
     // In a real app, this would come from a backend or localStorage
     // const savedProfile = localStorage.getItem('userProfile');
     // const savedProfile = await getDoc(doc(db, 'users', auth.currentUser.uid));
-    const savedProfile = await onSnapshot(doc(db, 'users', auth.currentUser.uid), (data) => {
-        // console.log(data.exists());
+    const data = await getDoc(doc(db, 'clients', auth.currentUser.uid))
+
 
         if (data.exists()) {
             // console.log(data.data());
@@ -322,8 +326,6 @@ async function loadUserProfile() {
         // elements.profileDepartment.value = state.userProfile.department;
         // elements.profileLevel.value = state.userProfile.level;
 
-        
-    });
 }
 
 // Toggle theme
@@ -386,6 +388,20 @@ function startTest() {
       department: elements.departmentInput.value.trim() || '',
       faculty: elements.facultyInput.value.trim() || '',
     });
+
+    localStorage.setItem('localUserProfile', JSON.stringify({ 
+      name: elements.fullNameInput.value.trim() || '',
+      matricno: elements.matricNoInput.value.trim() || '',
+      department: elements.departmentInput.value.trim() || '',
+      faculty: elements.facultyInput.value.trim() || '',
+    }));
+
+    updateData(auth.currentUser.uid, {
+            name: elements.fullNameInput.value.trim() || '',
+            matricno: elements.matricNoInput.value.trim() || '',
+            department: elements.departmentInput.value.trim() || '',
+            faculty: elements.facultyInput.value.trim() || '',
+        })
 
     state.timeRemaining = state.testDuration * 60;
     updateTimerDisplay();
@@ -634,6 +650,19 @@ function calculateResults() {
             scores: [totalCorrect, totalQuestions, totalPercentage],
             takenTests: true,
         });
+        localStorage.setItem('localUserProfile', JSON.stringify({ 
+            ...JSON.parse(localStorage.getItem('localUserProfile')),
+            scores: [totalCorrect, totalQuestions, totalPercentage],
+            takenTests: true,
+        }));
+        updateData(auth.currentUser.uid, {
+            scores: [totalCorrect, totalQuestions, totalPercentage],
+        })
+        // setData({
+        //     ...JSON.parse(localStorage.getItem('userProfile')),
+        //     scores: [totalCorrect, totalQuestions, totalPercentage],
+        //     takenTests: true,
+        // });
     } catch (error) {
         // console.log(error);
         
