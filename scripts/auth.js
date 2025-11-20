@@ -228,8 +228,13 @@ let activityTimeout;
 onAuthStateChanged(auth, async (user) => {
   window.currentUser = user;
   if (user) {
-    // console.log(user);
-    localStorage.setItem('localUserID', 'null');
+    function doesItemExist(key) {
+      return localStorage.getItem(key) !== null;
+    }
+
+    if (!doesItemExist('localUserID')) {
+      localStorage.setItem('localUserID', 'null');
+    }
     const savedProfile = await getDoc(doc(db, 'clients', user.uid));
     const userProfile = savedProfile.data() || {};
 

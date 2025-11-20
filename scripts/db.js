@@ -48,7 +48,7 @@ const EME127QuestionsData = {
             },
             {
                 "No": 5,
-                "question": "The sourcing process is about",
+                "question": "The sourcing process does not involve",
                 "options": [
                     "I. Collecting data on good quality sources of goods and services",
                     "II. Negotiating contracts",
