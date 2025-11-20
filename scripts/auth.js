@@ -248,7 +248,7 @@ onAuthStateChanged(auth, async (user) => {
         localStorage.setItem('localUserProfile', JSON.stringify({...JSON.parse((localStorage.getItem('localUserProfile'))), takenTests: userProfile.takenTests}));
         // alert('it was me');
         
-        return userProfile.takenTests;
+        return userProfile.takenTests || false;
       };
   
       // console.log('takenTests[DB, LocalStorage]: ', userProfile.takenTests, JSON.parse(localStorage.getItem('localUserProfile')).takenTests);
