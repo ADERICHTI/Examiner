@@ -228,26 +228,31 @@ let activityTimeout;
 onAuthStateChanged(auth, async (user) => {
   window.currentUser = user;
   if (user) {
-    console.log(user);
+    // console.log(user);
     
     const savedProfile = await getDoc(doc(db, 'clients', user.uid));
     const userProfile = savedProfile.data() || {};
 
-    localStorage.setItem('localUserProfile', JSON.stringify({...JSON.parse((localStorage.getItem('localUserProfile'))), takenTests: JSON.parse((localStorage.getItem('localUserProfile'))).takenTests || false}))
-
-    const override = () =>{
-      localStorage.setItem('localUserProfile', JSON.stringify({...JSON.parse((localStorage.getItem('localUserProfile'))), takenTests: userProfile.takenTests}));
-      alert('it was me');
+    try {
       
-      return userProfile.takenTests;
-    };
-
-    console.log('takenTests[DB, LocalStorage]: ', userProfile.takenTests, JSON.parse(localStorage.getItem('localUserProfile')).takenTests);
-
-    const hasTakenTest = userProfile.takenTests === JSON.parse(localStorage.getItem('localUserProfile')).takenTests ? JSON.parse(localStorage.getItem('localUserProfile')).takenTests 
-    : 
-    userProfile.override ? override() : JSON.parse(localStorage.getItem('localUserProfile')).takenTests;
-    
+      localStorage.setItem('localUserProfile', JSON.stringify({...JSON.parse((localStorage.getItem('localUserProfile'))), takenTests: JSON.parse((localStorage.getItem('localUserProfile'))).takenTests || false}))
+  
+      const override = () =>{
+        localStorage.setItem('localUserProfile', JSON.stringify({...JSON.parse((localStorage.getItem('localUserProfile'))), takenTests: userProfile.takenTests}));
+        // alert('it was me');
+        
+        return userProfile.takenTests;
+      };
+  
+      // console.log('takenTests[DB, LocalStorage]: ', userProfile.takenTests, JSON.parse(localStorage.getItem('localUserProfile')).takenTests);
+  
+      const hasTakenTest = userProfile.takenTests === JSON.parse(localStorage.getItem('localUserProfile')).takenTests ? JSON.parse(localStorage.getItem('localUserProfile')).takenTests 
+      : 
+      userProfile.override ? override() : JSON.parse(localStorage.getItem('localUserProfile')).takenTests || false;
+      
+    } catch (error) {
+      
+    }
     
     // User signed in
     setupUserProfile(user);
