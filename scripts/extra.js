@@ -6,7 +6,7 @@ const supabase = createClient(supabaseUrl, supabaseKey)
 
 // Use the correct table name
 async function testConnection() {
-    console.log('Testing connection...')
+    // console.log('Testing connection...')
     
     // Replace 'your_table' with your actual table name (e.g., 'users')
     const { data, error } = await supabase
@@ -14,9 +14,9 @@ async function testConnection() {
         .select('*')
     
     if (error) {
-        console.log('Error:', error.message)
+        // console.log('Error:', error.message)
     } else {
-        console.log('✅ Success! Data:', data)
+        // console.log('✅ Success! Data:', data)
     }
 }
 
@@ -31,9 +31,9 @@ async function addTestData() {
         .select()
     
     if (error) {
-        console.log('Insert error:', error.message)
+        // console.log('Insert error:', error.message)
     } else {
-        console.log('✅ Test data added:', data)
+        // console.log('✅ Test data added:', data)
     }
 }
 
@@ -46,9 +46,9 @@ async function addData(dataToAdd={ name: 'marku rae', email: 'marku@example.com'
         .select()
     
     if (error) {
-        console.log('Insert error:', error.message)
+        // console.log('Insert error:', error.message)
     } else {
-        console.log('✅ Data added:', data)
+        // console.log('✅ Data added:', data)
     }
 }
 
@@ -63,7 +63,7 @@ async function updateData(userId, updates={email: 'this is new@gmail.vom'}) {
     
     
     if (Object.keys(updates).length === 0) {
-        console.log('No changes made');
+        // console.log('No changes made');
         return
     }
     
@@ -75,11 +75,11 @@ async function updateData(userId, updates={email: 'this is new@gmail.vom'}) {
     
     if (error) {
         console.error('Update error:', error)
-        console.log('Error updating user: ' + error.message)
+        // console.log('Error updating user: ' + error.message)
     } else {
-        console.log('✏️ User updated:', data)
-        console.log('User updated successfully!')
-        readData() // Refresh the list
+        // console.log('✏️ User updated:', data)
+        // console.log('User updated successfully!')
+        // readData() // Refresh the list
     }
 }
 
@@ -94,7 +94,7 @@ async function readData(name='users') {
         console.error('Read error:', error)
         return []
     } else {
-        console.log('📖 Users:', data)
+        // console.log('📖 Users:', data)
         return data
     }
 }
@@ -123,10 +123,10 @@ async function addIfNotExists(userData, uniqueColumn = 'email') {
             console.error('Insert error:', error)
             return null
         }
-        console.log('✅ New user added:', data[0])
+        // console.log('✅ New user added:', data[0])
         return data[0]
     } else {
-        console.log('⚠️ User already exists:', existing)
+        // console.log('⚠️ User already exists:', existing)
         return existing
     }
 }

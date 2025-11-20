@@ -469,11 +469,11 @@ function switchSubject(subject) {
 function setupQuestionIndicators() {
     elements.questionIndicators.innerHTML = '';
     const questions = questionsData[state.currentSubject].questions;
-    console.log(questions);
+    // console.log(questions);
     
 
     questions.forEach((_, index) => {
-        console.log(questions[index]);
+        // console.log(questions[index]);
         
         const indicator = document.createElement('div');
         indicator.className = `question-indicator ${index === state.currentQuestionIndex ? 'current' : ''} ${state.userAnswers[state.currentSubject][index] !== null ? 'answered' : ''}`;
