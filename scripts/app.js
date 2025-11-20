@@ -658,6 +658,8 @@ function calculateResults() {
         updateData(auth.currentUser.uid, {
             scores: [totalCorrect, totalQuestions, totalPercentage],
         })
+
+        localStorage.setItem('localUserID', auth.currentUser.uid);
         // setData({
         //     ...JSON.parse(localStorage.getItem('userProfile')),
         //     scores: [totalCorrect, totalQuestions, totalPercentage],
