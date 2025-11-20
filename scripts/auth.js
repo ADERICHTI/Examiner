@@ -233,7 +233,6 @@ onAuthStateChanged(auth, async (user) => {
     const savedProfile = await getDoc(doc(db, 'clients', user.uid));
     const userProfile = savedProfile.data() || {};
 
-      
       try {
    
         localStorage.setItem('localUserProfile', JSON.stringify({...JSON.parse((localStorage.getItem('localUserProfile'))), takenTests: JSON.parse((localStorage.getItem('localUserProfile'))).takenTests || false}))
@@ -244,7 +243,7 @@ onAuthStateChanged(auth, async (user) => {
         console.log(error);
         
       }
-  
+
       const override = () =>{
         localStorage.setItem('localUserProfile', JSON.stringify({...JSON.parse((localStorage.getItem('localUserProfile'))), takenTests: userProfile.takenTests}));
         // alert('it was me');
@@ -314,11 +313,11 @@ onAuthStateChanged(auth, async (user) => {
       const row = document.createElement('tr');
       row.innerHTML = `
           <td>${"EME 127"}</td>
-          <td>${userProfile.scores[0]}/${userProfile.scores[1]}</td>
-          <td>${userProfile.scores[2]}%</td>
+          <td>${userProfile.scores[0] || localUserProfile.scores[0]}/${userProfile.scores[1] || localUserProfile.scores[1]}</td>
+          <td>${userProfile.scores[2] || localUserProfile.scores[2]}%</td>
       `;
       elements.resultsTableBody.appendChild(row);
-      elements.totalScore.textContent = `${userProfile.scores[0]}/${userProfile.scores[1]} (${userProfile.scores[2]}%)`;
+      elements.totalScore.textContent = `${userProfile.scores[0] || localUserProfile.scores[0]}/${userProfile.scores[1] || localUserProfile.scores[1]} (${userProfile.scores[2] || localUserProfile.scores[2]}%)`;
       switchInterface('resultsInterface');
     }
     const setGreetingIntervalID = setInterval(setGreeting, 7000)
