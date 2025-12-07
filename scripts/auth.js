@@ -341,9 +341,9 @@ onAuthStateChanged(auth, async (user) => {
 
       try {
         
-        upsertItem('users', 'user_id', user.uid, {...JSON.parse((localStorage.getItem(localUserProfileID))), takenTests: JSON.parse((localStorage.getItem(localUserProfileID))).takenTests || false}, state.localStorageAvailable);
+        upsertItem('users', 'user_id', user.uid, {...JSON.parse((localStorage.getItem(localUserProfileID) || '{}')), takenTests: JSON.parse((localStorage.getItem(localUserProfileID) || '{}')).takenTests || false}, state.localStorageAvailable);
 
-        localStorage.setItem(localUserProfileID, JSON.stringify({...JSON.parse((localStorage.getItem(localUserProfileID))), takenTests: userProfile.takenTests || false}));
+        localStorage.setItem(localUserProfileID, JSON.stringify({...JSON.parse((localStorage.getItem(localUserProfileID) || '{}')), takenTests: userProfile.takenTests || false}));
         
       } catch (error) {
   
