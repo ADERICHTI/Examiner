@@ -362,24 +362,36 @@ onAuthStateChanged(auth, async (user) => {
       // console.log('takenTests[DB, LocalStorage]: ', userProfile.takenTests, JSON.parse(localStorage.getItem(localUserProfileID)).takenTests);
       console.log(localStorage.getItem('localUserID'));
       
-      const hasTakenTest = state.isFirestoreAvailable ? userProfile.takenTests === (JSON.parse(localStorage.getItem(localUserProfileID)).takenTests || false) ? JSON.parse(localStorage.getItem(localUserProfileID)).takenTests 
-      : 
-      localStorage.getItem('localUserID') === 'null' ? userProfile.takenTests || false
-      :
-      userProfile.override ? override() : JSON.parse(localStorage.getItem(localUserProfileID)).takenTests || false
-      // if first condition is false, check from back4app
-      :
-      queryItems('users', { user_id: user.uid }).then(results => {
-        const userData = results[0] || {};
-        return userData.takenTests === JSON.parse(localStorage.getItem(localUserProfileID)).takenTests ? JSON.parse(localStorage.getItem(localUserProfileID)).takenTests
-        :
-        localStorage.getItem('localUserID') === 'null' ? userData.takenTests || false
-        :
-        userData.override ? override() : JSON.parse(localStorage.getItem(localUserProfileID)).takenTests || false
-      }
-      ).catch(error => {
-        console.log(error);
-      });
+const hasTakenTest = await (async () => {
+    const localProfile = JSON.parse(localStorage.getItem(localUserProfileID) || '{}');
+    const localUserID = localStorage.getItem('localUserID');
+    
+    if (state.isFirestoreAvailable) {
+        // Check various conditions with proper fallbacks
+        if (userProfile?.override) {
+            const overrideResult = await override();
+            return overrideResult?.takenTests ?? false;
+        }
+        
+        return userProfile?.takenTests ?? 
+               localProfile.takenTests ?? 
+               (localUserID === 'null' ? userProfile?.takenTests : false) ?? 
+               false;
+    } else {
+        try {
+            const results = await queryItems('users', { user_id: user.uid });
+            const userData = results[0] || {};
+            
+            return userData.takenTests ?? 
+                   (localUserID === 'null' ? userData.takenTests : localProfile.takenTests) ?? 
+                   (userData.override ? (await override())?.takenTests : false) ?? 
+                   false;
+        } catch (error) {
+            console.error('Back4App failed:', error);
+            return localProfile.takenTests ?? false;
+        }
+    }
+})();
 
       
     
