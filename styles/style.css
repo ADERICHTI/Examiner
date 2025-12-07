@@ -1293,3 +1293,323 @@ body.dark-mode .explain-btn {
 .math-inline {
     white-space: nowrap;
 }
+
+/* ===== ADMIN TABLE STYLES ===== */
+
+.admin-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+    padding: var(--space-md);
+    background: var(--glass-bg);
+    backdrop-filter: var(--blur-effect);
+    border: var(--glass-border);
+    border-radius: 12px;
+    align-items: center;
+}
+
+.admin-search-box {
+    flex: 1;
+    min-width: 200px;
+    position: relative;
+}
+
+.admin-search-box input {
+    width: 100%;
+    padding: var(--space-sm) var(--space-md);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: all var(--transition-normal);
+}
+
+.admin-search-box input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+}
+
+.dark-mode .admin-search-box input {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--darker);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.admin-search-box i {
+    position: absolute;
+    right: var(--space-md);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--medium);
+}
+
+.admin-actions {
+    display: flex;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+}
+
+.db-status-display {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    background: rgba(66, 133, 244, 0.1);
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.db-status-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    animation: pulse-status 2s ease-in-out infinite;
+}
+
+.db-status-indicator.firebase {
+    background-color: #4285F4;
+}
+
+.db-status-indicator.supabase {
+    background-color: #24B47E;
+}
+
+.db-status-indicator.appwrite {
+    background-color: #FD366E;
+}
+
+.db-status-indicator.back4app {
+    background-color: #FF6B6B;
+}
+
+.db-status-indicator.localstorage {
+    background-color: #FFA500;
+}
+
+@keyframes pulse-status {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.data-table-container {
+    background: var(--glass-bg);
+    backdrop-filter: var(--blur-effect);
+    border: var(--glass-border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--glass-shadow);
+    margin-top: var(--space-md);
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+}
+
+.data-table thead {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.data-table th {
+    padding: var(--space-md);
+    text-align: left;
+    font-weight: 600;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+    user-select: none;
+    white-space: nowrap;
+}
+
+.data-table th.sortable {
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+}
+
+.data-table th.sortable:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.data-table th.sorted {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.sort-indicator {
+    margin-left: var(--space-sm);
+    font-size: 0.85em;
+    font-weight: 700;
+}
+
+.data-table tbody tr {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    transition: background-color var(--transition-fast);
+}
+
+.dark-mode .data-table tbody tr {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.data-table tbody tr:hover {
+    background-color: rgba(66, 133, 244, 0.05);
+}
+
+.data-table tbody tr.even {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.dark-mode .data-table tbody tr.even {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.data-table td {
+    padding: var(--space-md);
+    word-break: break-word;
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.data-table td.empty-message {
+    text-align: center;
+    color: var(--medium);
+    font-style: italic;
+    padding: var(--space-lg);
+}
+
+.table-stats {
+    display: flex;
+    gap: var(--space-lg);
+    margin-top: var(--space-md);
+    padding: var(--space-md);
+    background: rgba(66, 133, 244, 0.05);
+    border-radius: 8px;
+    flex-wrap: wrap;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    color: var(--medium);
+    font-weight: 500;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.backend-selector {
+    display: flex;
+    gap: var(--space-sm);
+    padding: var(--space-md);
+    background: var(--glass-bg);
+    border: var(--glass-border);
+    border-radius: 12px;
+    flex-wrap: wrap;
+}
+
+.backend-btn {
+    padding: var(--space-sm) var(--space-md);
+    border: 2px solid transparent;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.backend-btn:hover {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+.backend-btn.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary-dark);
+}
+
+.dark-mode .backend-btn {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.dark-mode .backend-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.backend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.backend-dot.ready {
+    background-color: #34A853;
+}
+
+.backend-dot.failed {
+    background-color: #EA4335;
+}
+
+.backend-dot.quota_exceeded {
+    background-color: #FBBC05;
+}
+
+.backend-dot.initializing {
+    background-color: #999da3;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .admin-controls {
+        flex-direction: column;
+    }
+    
+    .admin-search-box {
+        min-width: 100%;
+    }
+    
+    .data-table {
+        font-size: 0.85rem;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: var(--space-sm);
+    }
+    
+    .table-stats {
+        flex-direction: column;
+        gap: var(--space-md);
+    }
+    
+    .backend-selector {
+        flex-direction: column;
+    }
+    
+    .backend-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}

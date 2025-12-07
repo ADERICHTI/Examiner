@@ -208,6 +208,44 @@
 
 
     
+    <script src="https://cdn.jsdelivr.net/npm/appwrite@13.0.0"></script>
+    <!-- <script src="https://npmcdn.com/parse/dist/parse.min.js"></script> -->
+    <script type="text/javascript" src="https://unpkg.com/parse/dist/parse.min.js"></script>
+    <script type="module" src="./scripts/extra-003.js"></script>
+    <script type="module" src="./scripts/extra-002.js"></script>
+
+    <!-- <script>
+        const CONFIG = {
+    apikey: 'https://fra.cloud.appwrite.io/v1',
+    projectId: '021225',
+    databaseId: 'examinerdb021225',
+    collectionId: 'users021225',
+}
+        // Global variables
+let client = null;
+let database = null;
+
+// Initialize Appwrite
+function initAppwrite() {
+    try {
+        // 1. Create client
+        client = new Appwrite.Client()
+            .setEndpoint('https://cloud.appwrite.io/v1')
+            .setProject(CONFIG.projectId);
+        
+        // 2. Create database instance
+        database = new Appwrite.Databases(client);
+        
+        console.log('✅ Appwrite initialized');
+        return true;
+    } catch (error) {
+        console.error('❌ Initialization failed:', error);
+        return false;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', initAppwrite)
+    </script> -->
     <script type="module" src="./scripts/auth.js"></script>
     <script src="./scripts/db.js"></script>
     <script type="module" src="./scripts/app.js"></script>
