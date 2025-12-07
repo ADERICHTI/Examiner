@@ -362,7 +362,7 @@ onAuthStateChanged(auth, async (user) => {
       // console.log('takenTests[DB, LocalStorage]: ', userProfile.takenTests, JSON.parse(localStorage.getItem(localUserProfileID)).takenTests);
       console.log(localStorage.getItem('localUserID'));
       
-      const hasTakenTest = state.isFirestoreAvailable ? userProfile.takenTests === JSON.parse(localStorage.getItem(localUserProfileID)).takenTests ? JSON.parse(localStorage.getItem(localUserProfileID)).takenTests 
+      const hasTakenTest = state.isFirestoreAvailable ? userProfile.takenTests === (JSON.parse(localStorage.getItem(localUserProfileID)).takenTests || false) ? JSON.parse(localStorage.getItem(localUserProfileID)).takenTests 
       : 
       localStorage.getItem('localUserID') === 'null' ? userProfile.takenTests || false
       :
