@@ -1,175 +1,230 @@
-const EME127QuestionsData = {
-    "EME 127 Test": {
+const EME401QuestionsData = {
+    "DLC_EME_401_TEST": {
         "required": true,
         "questions": [
             {
                 "No": 1,
-                "question": "Sourcing Models include but not",
+                "question": "In the course of planning and administering educational services to the different group",
                 "options": [
-                    "I. performance-based/managed services model",
-                    "II. preferential provider model",
-                    "III. approved provider model",
-                    "IV. basic provider model"
+                    "I. The pluralistic nature of Nigeria society ought to determine the type of education for the various groups.",
+                    "II. It is important to consider environmental background of the various groups.",
+                    "III. We must ensure that no group moves far away from the shared or common value.",
+                    "IV. The heterogenous nature of Nigeria society ought to influence the type of education requires for the various groups."
                 ],
                 "answers": ["II"]
             },
             {
                 "No": 2,
-                "question": "The following are factors central to the sourcing process except",
+                "question": "One of the following is not correct",
                 "options": [
-                    "I. Cost structure",
-                    "II. Profit margins",
-                    "III. Budget size",
-                    "IV. Competitiveness"
+                    "I. The educational planners and administrators alike are from the society and they function within the society.",
+                    "II. Educational institutions planned and administered by education administrators are located outside the society.",
+                    "III. Certain socio-political considerations affect both the educational planners' and administrators' decisions and actions.",
+                    "IV. All forms of social political factors affect educational institutions."
                 ],
-                "answers": ["III"]
+                "answers": ["II"]
             },
             {
                 "No": 3,
-                "question": "The five basic supplier's selection activities to establish a supply network that supports organisational goals include",
+                "question": "Select a sentence which is not correct",
                 "options": [
-                    "I. Supplier pre-qualification, supplier contractual purpose, supplier screening, contracting and supplier onboarding.",
-                    "II. supplier contractual purpose, supplier identification, supplier screening, supplier onboarding and negotiation.",
-                    "III. Supplier identification, supplier evaluation, supplier screening, negotiation and contracting, and supplier onboarding.",
-                    "IV. Supplier identification, supplier evaluation, supplier screening, supplier onboarding and supplier contractual purpose."
+                    "I. The presence of school in the community can expose the community to social amenities.",
+                    "II. Members of the community where a school is located can provide security for the facilities in that school.",
+                    "III. Good school community relations are very essential to be a successful manager.",
+                    "IV. Members of the community where a school is located must provide financial support and physical labour for the development of the school."
                 ],
-                "answers": ["III"]
+                "answers": ["IV"]
             },
             {
                 "No": 4,
-                "question": "Purchase order is",
+                "question": "Factors that influence educational planning and administration does not include",
                 "options": [
-                    "I. A formal legal document or request within a company to initiate a purchase",
-                    "II. A process that includes strategic sourcing, procurement, and payment activities",
-                    "III. The broader process of purchasing goods and services involving sourcing, negotiation and purchasing.",
-                    "IV. A formal legal document from a buyer to a supplier, confirming the intent to procure goods or services."
+                    "I. Technology and politics",
+                    "II. Religion and culture",
+                    "III. Politics and economy",
+                    "IV. Science and technology"
                 ],
                 "answers": ["IV"]
             },
             {
                 "No": 5,
-                "question": "The sourcing process does not involve",
+                "question": "Socio-political context of educational planning and administration tries to",
                 "options": [
-                    "I. Collecting data on good quality sources of goods and services",
-                    "II. Negotiating contracts",
-                    "III. Considering outsourcing for goods",
-                    "IV. Considering potential profit."
+                    "I. Accentuate that knowledge of social studies and political science is essential for educational planners and administrations.",
+                    "II. Explain the relationship between social-political development of a nation and educational planning and administration.",
+                    "III. Emphasize that social and political activities need to be studied for effective planning and administration of education.",
+                    "IV. To describe how education can be provided putting into consideration the various factors that could influence its success or failure."
                 ],
                 "answers": ["IV"]
             },
             {
                 "No": 6,
-                "question": "Which of the following is not a core purchasing function activity?",
+                "question": "In Northern Nigeria, Islamic studies",
                 "options": [
-                    "I. Need identification, market research, invoice verification and negotiation.",
-                    "II. Invoice verification, relationship management, supplier selection and market research.",
-                    "III. Supplier selection, logistics, order-placement and follow-up.",
-                    "IV. Order-placement, follow-up and negotiation"
+                    "I. May and may not be included as a subject of study since Nigeria is a secular state.",
+                    "II. Should be included as an elective subject of study.",
+                    "III. Should be included as a compulsory subject of study.",
+                    "IV. May be included as a compulsory subject of study."
                 ],
                 "answers": ["III"]
             },
             {
                 "No": 7,
-                "question": "2/10 Net 30 as a term of payment for goods means",
+                "question": "The federal government of Nigeria is __________ to change our academic policies",
                 "options": [
-                    "I. A buyer will receive 2% discount if he can pay for the goods 10 times within 30 days.",
-                    "II. A buyer will enjoy 2% discount for payment in 10 days, with the balance due in 30 days.",
-                    "III. A buyer will receive 10% discount if he can pay for the goods 2 times within 30 days.",
-                    "IV. A buyer will enjoy 10% 2 times within 30 days if he can pay without delay."
-                ],
-                "answers": ["II"]
-            },
-            {
-                "No": 8,
-                "question": "One of the following is not an importance of contracts",
-                "options": [
-                    "I. Provision of a legal framework for transaction to protect buyer and seller.",
-                    "II. Reduce ambiguity by providing clear expectations for both buyer and seller.",
-                    "III. Risk management is made possible by addressing potential issues like cost increases or delays upfront.",
-                    "IV. Buyers are able to pay for the time spent and materials used, which is often used when the project scope is not clearly defined."
+                    "I. Education",
+                    "II. Administration",
+                    "III. Society",
+                    "IV. Planning"
                 ],
                 "answers": ["IV"]
             },
             {
-                "No": 9,
-                "question": "Source-to-pay (S2P) means",
+                "No": 8,
+                "question": "The current school __________ has been informed the Federal government is planning to change the schooling system in Nigeria",
                 "options": [
-                    "I. A more comprehensive process which includes strategic sourcing, procurement and payment activities.",
-                    "II. A channel that shows goods or services have been delivered by the supplier crucial for 2-way matching.",
-                    "III. Placing orders, tracking deliveries and ensuring timely arrival of goods.",
-                    "IV. An integrated system connecting the entire purchasing process from requisition to invoice payment."
+                    "I. Education",
+                    "II. Administration",
+                    "III. Society",
+                    "IV. Planning"
+                ],
+                "answers": ["II"]
+            },
+            {
+                "No": 9,
+                "question": "The essence is to improve the __________ we get",
+                "options": [
+                    "I. Education",
+                    "II. Administration",
+                    "III. Society",
+                    "IV. Planning"
                 ],
                 "answers": ["I"]
             },
             {
                 "No": 10,
-                "question": "Essential elements for a valid contract include",
+                "question": "One of the following is not a characteristic of education",
                 "options": [
-                    "I. Legal capacity, common purpose, legality of purpose, offer etc.",
-                    "II. Offer, acceptance, legislation, common purpose etc.",
-                    "III. Offer, consideration, legal capacity, acceptance etc.",
-                    "IV. Mutual consent, intention to create legal relations, legislation, ethical consideration etc."
-                ],
-                "answers": ["III"]
-            },
-            {
-                "No": 11,
-                "question": "Purchase requisition means",
-                "options": [
-                    "I. A formal legal document from a buyer to a supplier, confirming the intent to procure goods or services",
-                    "II. The broader process of purchasing goods and services involving sourcing, negotiation and purchasing.",
-                    "III. Placing orders, tracking deliveries and ensuring timely arrival of goods.",
-                    "IV. An internal document or request within a company to initiate a purchase."
-                ],
-                "answers": ["IV"]
-            },
-            {
-                "No": 12,
-                "question": "Spending less and increasing the bottom line is the goal for",
-                "options": [
-                    "I. Most purchase teams",
-                    "II. Most procurement teams",
-                    "III. Most Purchase and supply teams",
-                    "IV. Most purchase or procurement teams"
+                    "I. There is a process of transmission.",
+                    "II. It takes place in any institution.",
+                    "III. It fosters development of individuals.",
+                    "IV. There should be a legitimate method of transmission of knowledge."
                 ],
                 "answers": ["II"]
             },
             {
-                "No": 13,
-                "question": "Strict liability means",
+                "No": 11,
+                "question": "The school National development plan of Nigeria puts the national objectives of the country as the buildings of",
                 "options": [
-                    "I. the buyer's intent or knowledge of the infringement is not necessary for the patent holder to seek monetary damages.",
-                    "II. the buyer's intent or knowledge of the infringement is necessary for the patent holder to seek monetary damages.",
-                    "III. the buyer's intent or knowledge of the infringement is enough for the patent holder to collect monetary damages.",
-                    "IV. the buyer's intent or knowledge of the infringement is not enough for the patent holder to collect monetary damages."
+                    "I. A just and democratic society.",
+                    "II. A great and egalitarian society.",
+                    "III. A land of bright and full opportunities for all citizens.",
+                    "IV. A strong and dynamic economy."
+                ],
+                "answers": ["III"]
+            },
+            {
+                "No": 12,
+                "question": "The Federal government has put in place quota admission policy",
+                "options": [
+                    "I. To reduce the gap in North-south level of education department.",
+                    "II. To reduce the gap in North-west level of education department.",
+                    "III. To reduce the gap in South-east level of education department.",
+                    "IV. To reduce the gap in South-west level of education department."
                 ],
                 "answers": ["I"]
             },
             {
-                "No": 14,
-                "question": "Procure-to-pay (P2P) means",
+                "No": 13,
+                "question": "The prescription of the 1882 Education ordinance include",
                 "options": [
-                    "I. Placing orders, tracking deliveries and ensuring timely arrival of goods.",
-                    "II. A channel that shows goods or services have been delivered by the supplier crucial for 2-way matching.",
-                    "III. An integrated system connecting the entire purchasing process from requisition to invoice payment.",
-                    "IV. A more comprehensive process which includes strategic sourcing, procurement and payment activities."
+                    "I. Creation of Education Board.",
+                    "II. Stipulation of rates and conditions for the award of quantity.",
+                    "III. A capitation grants in proportion of the average attendance at school.",
+                    "IV. Stipulation of standard of examination."
+                ],
+                "answers": ["III"]
+            },
+            {
+                "No": 14,
+                "question": "One of the following is not true of the 1887 Education Ordinance",
+                "options": [
+                    "I. It stipulates principal's power to grant scholarship for secondary education.",
+                    "II. It is a purely Nigerian Education ordinance to be enacted.",
+                    "III. It came as a result of the separation of Lagos Colony from the Gold coast.",
+                    "IV. It created an Education Board."
+                ],
+                "answers": ["I"]
+            },
+            {
+                "No": 15,
+                "question": "The percentage recommended for grant-in-aid offered to efficiency of the feeding staff is",
+                "options": [
+                    "I. 40%",
+                    "II. 30%",
+                    "III. 20%",
+                    "IV. 10%"
+                ],
+                "answers": ["III"]
+            },
+            {
+                "No": 16,
+                "question": "One of the recommendations of the 1926 Education ordinance was",
+                "options": [
+                    "I. Creation of Education Board and giving board power to grant scholarship.",
+                    "II. Award of grants for organization and discipline with special grants for schools which obtained a high percentage of passes and those attained high standard of general excellence.",
+                    "III. Organize periodical examination and enhance tone of the school, discipline organization and moral institution.",
+                    "IV. Authorizing the closure of any school which was conducted in a way that was in conflict with the interest of the people or the host community."
                 ],
                 "answers": ["IV"]
             },
             {
-                "No": 15,
-                "question": "Purchasing functions involve all activities undertaken by a business",
+                "No": 17,
+                "question": "The 1990 World Conference on Education in Jomtien, Thailand gave all signatory countries to ensure the provision of primary education for all by",
                 "options": [
-                    "I. To acquire the necessary goods, and services from suppliers to produce its products",
-                    "II. To acquire the necessary goods and materials from external sources to produce its products",
-                    "III. To acquire the necessary goods, and services from external sources to operate and produce its products",
-                    "IV. To acquire the necessary goods, services and materials from external sources to operate and produce its products."
+                    "I. The year 2000.",
+                    "II. The year 2023.",
+                    "III. The year 1995.",
+                    "IV. The year 1997."
                 ],
-                "answers": ["IV"]
+                "answers": ["I"]
+            },
+            {
+                "No": 18,
+                "question": "Which of the following is true of pressure groups",
+                "options": [
+                    "I. They promote interpersonal relationship among members and management or government.",
+                    "II. They always influence the management or government with their strong collective power.",
+                    "III. Members always react if the action, not in-action of the institution or business to which they belong affect them.",
+                    "IV. Pressure groups exist in all school organizations in Nigeria."
+                ],
+                "answers": ["I"]
+            },
+            {
+                "No": 19,
+                "question": "Methods of manpower requirement approach of educational planning does not include",
+                "options": [
+                    "I. Harbison's Rule of Thumb.",
+                    "II. The incremental labour Output Ratio.",
+                    "III. The density percentage.",
+                    "IV. The parues-mediterranean regional project."
+                ],
+                "answers": ["III"]
+            },
+            {
+                "No": 20,
+                "question": "Economic approaches to education include",
+                "options": [
+                    "I. Social cost consideration, manpower forecast and investment efficiency.",
+                    "II. Manpower requirement, social demand and investment efficiency.",
+                    "III. Investment effectiveness, social requirement and manpower.",
+                    "IV. Social demand, manpower requirement and investment-consumption analysis."
+                ],
+                "answers": ["II"]
             }
         ]
     }
+};
 
-  }
+const questionsData = {...EME401QuestionsData};
 
-const questionsData = {...EME127QuestionsData};

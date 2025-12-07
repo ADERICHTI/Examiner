@@ -1,5 +1,7 @@
 import { setGreeting, loadUserProfile, showMessage, getRandomInteger, switchInterface } from "./app.js";
 import { testConnection, addData, readData, updateData, addIfNotExists } from "./extra.js";
+import { upsertDocument } from "./extra-002.js";
+import { upsertItem, getItemById, queryItems, updateItem } from "./extra-003.js";
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { 
@@ -225,6 +227,105 @@ let activityTimeout;
 // const user = auth.currentUser;
 // Auth State Management
 
+const state = {
+  localStorageAvailable: null
+};
+
+function isLocalStorageAvailable(simpleCheck = true) {
+  try {
+    if (simpleCheck) {
+    const testKey = '__test__';
+    localStorage.setItem(testKey, testKey);
+    localStorage.removeItem(testKey);
+    } else {
+      const testKey = '__test__';
+      localStorage.setItem(testKey, JSON.stringify({ test: 'data', nested: true, arr: [1, 2, 3], obj: { a: 1, b: 2 }, words: 'Hello, world! yeeeeeeeeeeeeeeeeeeeeeeeeeeeah', listo: 'Hello, world! yeeeeeeeeeeeeeeeeeeeeeeeeeeeah', store: [1,2,3,4,5,6,7,8,7,6,5,4,2,2,2,3,4,5,5,5,], pull: [1,2,3,4,5,6,7,8,7,6,5,4,2,2,2,3,4,5,5,5,], cool: true, car: [1, 2, 3], obto: { a: 1, b: 2 }, listocat: 'Hello, world! yeeeeeeeeeeeeeeeeeeeeeeeeeeeah', arc: 'Hello, world! yeeeeeeeeeeeeeeeeeeeeeeeeeeeah', store: [1,2,3,4,5,6,7,8,7,6,5,4,2,2,2,3,4,5,5,5,], till: [1,2,3,4,5,6,7,8,7,6,5,4,2,2,2,3,4,5,5,5,] }));
+      const value = localStorage.getItem(testKey);
+      localStorage.removeItem(testKey); 
+      if (value !== testKey) {
+        return false;
+      }
+    }
+    return true;
+
+  } catch (e) {
+    return false;
+  }
+}
+
+
+async function quickFirestoreTest(db) {
+    if (!db) {
+        console.error('❌ No Firestore instance provided');
+        return false;
+    }
+    
+    try {
+        console.log('⚡ Quick Firestore v9 test...');
+        
+        // Create test document reference
+        const testDocId = 'test_' + Date.now();
+        const testRef = doc(db, '_quick_test', testDocId);
+        
+        // 1. Write test
+        console.log('Writing...');
+        await setDoc(testRef, {
+            test: true,
+            timestamp: new Date().toISOString(),
+            message: 'Firestore test'
+        });
+        console.log('✅ Write successful');
+        
+        // 2. Read test
+        console.log('Reading...');
+        const docSnap = await getDoc(testRef);
+        console.log('✅ Read successful:', docSnap.exists() ? 'Document exists' : 'Missing');
+        
+        // 3. Delete test
+        console.log('Deleting...');
+        await deleteDoc(testRef);
+        console.log('✅ Delete successful');
+        
+        console.log('✅ 🔥Firestore is Ready for use');
+        
+        return true;
+    } catch (error) {
+        console.error('❌ Firestore v9 test failed:');
+        console.error('Message:', error.message);
+        console.error('Code:', error.code);
+        console.error('Stack:', error.stack);
+        
+        // Common error diagnostics
+        if (error.code === 'permission-denied') {
+            console.error('🔒 Permission denied! Check Firestore security rules');
+        } else if (error.code === 'unavailable') {
+            console.error('🌐 Network/Connectivity issue');
+        } else if (error.code === 'failed-precondition') {
+            console.error('⚙️ Database not properly configured');
+        }
+        
+        return false;
+    }
+}
+
+state.isFirestoreAvailable = await quickFirestoreTest(db);
+
+console.log(state.isFirestoreAvailable, 'is true');
+
+
+// if false then use, back4app
+state.localStorageAvailable = isLocalStorageAvailable(false);
+
+console.log(state.localStorageAvailable);
+
+try {
+  localStorage.removeItem('localUserProfile')
+} catch (error) {
+  console.log(error);
+}
+const accessmentID = 'eme127test001';
+const localUserProfileID = `localUserProfile${accessmentID}`;
+
 onAuthStateChanged(auth, async (user) => {
   window.currentUser = user;
   if (user) {
@@ -239,32 +340,48 @@ onAuthStateChanged(auth, async (user) => {
     const userProfile = savedProfile.data() || {};
 
       try {
-   
-        localStorage.setItem('localUserProfile', JSON.stringify({...JSON.parse((localStorage.getItem('localUserProfile'))), takenTests: JSON.parse((localStorage.getItem('localUserProfile'))).takenTests || false}))
+        
+        upsertItem('users', 'user_id', user.uid, {...JSON.parse((localStorage.getItem(localUserProfileID))), takenTests: JSON.parse((localStorage.getItem(localUserProfileID))).takenTests || false}, state.localStorageAvailable);
+
+        localStorage.setItem(localUserProfileID, JSON.stringify({...JSON.parse((localStorage.getItem(localUserProfileID))), takenTests: userProfile.takenTests || false}));
         
       } catch (error) {
   
-        localStorage.setItem('localUserProfile', JSON.stringify({...JSON.parse((localStorage.getItem('localUserProfile'))), takenTests: false}))
+        // localStorage.setItem(localUserProfileID, JSON.stringify({...JSON.parse((localStorage.getItem(localUserProfileID))), takenTests: false}))
         console.log(error);
         
       }
 
       const override = () =>{
-        localStorage.setItem('localUserProfile', JSON.stringify({...JSON.parse((localStorage.getItem('localUserProfile'))), takenTests: userProfile.takenTests}));
+        localStorage.setItem(localUserProfileID, JSON.stringify({...JSON.parse((localStorage.getItem(localUserProfileID))), takenTests: userProfile.takenTests}));
         // alert('it was me');
         
         return userProfile.takenTests || false;
       };
   
-      // console.log('takenTests[DB, LocalStorage]: ', userProfile.takenTests, JSON.parse(localStorage.getItem('localUserProfile')).takenTests);
+      // console.log('takenTests[DB, LocalStorage]: ', userProfile.takenTests, JSON.parse(localStorage.getItem(localUserProfileID)).takenTests);
       console.log(localStorage.getItem('localUserID'));
       
-      const hasTakenTest = userProfile.takenTests === JSON.parse(localStorage.getItem('localUserProfile')).takenTests ? JSON.parse(localStorage.getItem('localUserProfile')).takenTests 
+      const hasTakenTest = state.isFirestoreAvailable ? userProfile.takenTests === JSON.parse(localStorage.getItem(localUserProfileID)).takenTests ? JSON.parse(localStorage.getItem(localUserProfileID)).takenTests 
       : 
       localStorage.getItem('localUserID') === 'null' ? userProfile.takenTests || false
       :
-      userProfile.override ? override() : JSON.parse(localStorage.getItem('localUserProfile')).takenTests || false;
+      userProfile.override ? override() : JSON.parse(localStorage.getItem(localUserProfileID)).takenTests || false
+      // if first condition is false, check from back4app
+      :
+      queryItems('users', { user_id: user.uid }).then(results => {
+        const userData = results[0] || {};
+        return userData.takenTests === JSON.parse(localStorage.getItem(localUserProfileID)).takenTests ? JSON.parse(localStorage.getItem(localUserProfileID)).takenTests
+        :
+        localStorage.getItem('localUserID') === 'null' ? userData.takenTests || false
+        :
+        userData.override ? override() : JSON.parse(localStorage.getItem(localUserProfileID)).takenTests || false
+      }
+      ).catch(error => {
+        console.log(error);
+      });
 
+      
     
     // User signed in
     setupUserProfile(user);
@@ -304,7 +421,7 @@ onAuthStateChanged(auth, async (user) => {
       override: false,
     });
 
-    const localUserProfile = JSON.parse(localStorage.getItem('localUserProfile')) || {};
+    const localUserProfile = JSON.parse(localStorage.getItem(localUserProfileID)) || {};
 
     addIfNotExists({
       username: user.displayName,
@@ -317,16 +434,36 @@ onAuthStateChanged(auth, async (user) => {
       scores: localUserProfile.scores || [], // score in percentage
     })
 
+    // Backup upsert
+    upsertDocument( 'user_id', user.uid, {
+      username: user.displayName,
+      email: user.email,
+      user_id: user.uid,
+   })
+
+    // Backup upsert
+    upsertItem( 'users', 'user_id', user.uid, {
+      username: user.displayName,
+      email: user.email,
+      user_id: user.uid,
+   })
+
+   // settle for the others
+
     if (hasTakenTest === true) {
-      const row = document.createElement('tr');
-      row.innerHTML = `
-          <td>${"EME 127"}</td>
-          <td>${userProfile.scores[0] || localUserProfile.scores[0]}/${userProfile.scores[1] || localUserProfile.scores[1]}</td>
-          <td>${userProfile.scores[2] || localUserProfile.scores[2]}%</td>
-      `;
-      elements.resultsTableBody.appendChild(row);
-      elements.totalScore.textContent = `${userProfile.scores[0] || localUserProfile.scores[0]}/${userProfile.scores[1] || localUserProfile.scores[1]} (${userProfile.scores[2] || localUserProfile.scores[2]}%)`;
-      switchInterface('resultsInterface');
+      try {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${"EME 127"}</td>
+            <td>${userProfile.scores[0] || localUserProfile.scores[0]}/${userProfile.scores[1] || localUserProfile.scores[1]}</td>
+            <td>${userProfile.scores[2] || localUserProfile.scores[2]}%</td>
+        `;
+        elements.resultsTableBody.appendChild(row);
+        elements.totalScore.textContent = `${userProfile.scores[0] || localUserProfile.scores[0]}/${userProfile.scores[1] || localUserProfile.scores[1]} (${userProfile.scores[2] || localUserProfile.scores[2]}%)`;
+        switchInterface('resultsInterface');
+      } catch (error) {
+        console.log(error);
+      }
     }
     const setGreetingIntervalID = setInterval(setGreeting, 7000)
     loadUserProfile();
@@ -445,4 +582,4 @@ function hideAuthModal() {
 export { auth, setUser, doc, db, getDoc, serverTimestamp, getAuth, 
   GoogleAuthProvider, 
   signInWithPopup, 
-  onAuthStateChanged, initializeApp };
+  onAuthStateChanged, initializeApp, localUserProfileID };

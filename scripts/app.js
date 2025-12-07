@@ -2,16 +2,19 @@ import {
     signOut
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
+import { createItem, upsertDocument, getAllItems, getItemById, updateItem, deleteItem } from "./extra-002.js";
 import { testConnection, addData, readData, updateData, addIfNotExists } from "./extra.js";
 testConnection()
+
 // import { auth, setUser, db, doc, getDoc, onSnapshot, serverTimestamp, setResult } from "./auth.js";
 // import { auth, setUser, db, doc, getDoc, serverTimestamp, setResult } from "./auth.js";
-import { auth, setUser, db, doc, getDoc, serverTimestamp } from "./auth.js";
+import { auth, setUser, db, doc, getDoc, serverTimestamp, localUserProfileID } from "./auth.js";
+import { upsertItem } from "./extra-003.js";
 
 // Application State
 const state = {
     selectedSubjects: [],
-    testDuration: 15, // in minutes
+    testDuration: 20, // in minutes
     currentSubject: null,
     currentQuestionIndex: 0,
     userAnswers: {},
@@ -389,14 +392,29 @@ function startTest() {
       faculty: elements.facultyInput.value.trim() || '',
     });
 
-    localStorage.setItem('localUserProfile', JSON.stringify({ 
+    localStorage.setItem(localUserProfileID, JSON.stringify({ 
       name: elements.fullNameInput.value.trim() || '',
       matricno: elements.matricNoInput.value.trim() || '',
       department: elements.departmentInput.value.trim() || '',
       faculty: elements.facultyInput.value.trim() || '',
     }));
 
+    // Backup upsert
     updateData(auth.currentUser.uid, {
+            name: elements.fullNameInput.value.trim() || '',
+            matricno: elements.matricNoInput.value.trim() || '',
+            department: elements.departmentInput.value.trim() || '',
+            faculty: elements.facultyInput.value.trim() || '',
+        })
+    
+    upsertDocument('user_id', auth.currentUser.uid, {
+            name: elements.fullNameInput.value.trim() || '',
+            matricno: elements.matricNoInput.value.trim() || '',
+            department: elements.departmentInput.value.trim() || '',
+            faculty: elements.facultyInput.value.trim() || '',
+        })
+    
+    upsertItem('users', 'user_id', auth.currentUser.uid, {
             name: elements.fullNameInput.value.trim() || '',
             matricno: elements.matricNoInput.value.trim() || '',
             department: elements.departmentInput.value.trim() || '',
@@ -650,13 +668,22 @@ function calculateResults() {
             scores: [totalCorrect, totalQuestions, totalPercentage],
             takenTests: true,
         });
-        localStorage.setItem('localUserProfile', JSON.stringify({ 
-            ...JSON.parse(localStorage.getItem('localUserProfile')),
+        localStorage.setItem(localUserProfileID, JSON.stringify({ 
+            ...JSON.parse(localStorage.getItem(localUserProfileID)),
             scores: [totalCorrect, totalQuestions, totalPercentage],
             takenTests: true,
         }));
         updateData(auth.currentUser.uid, {
             scores: [totalCorrect, totalQuestions, totalPercentage],
+        })
+        // Backup in another collection
+        upsertDocument('user_id', auth.currentUser.uid, {
+            scores: [totalCorrect, totalQuestions, totalPercentage],
+        })
+        // Backup in another collection
+        upsertItem('users', 'user_id', auth.currentUser.uid, {
+            scores: [totalCorrect, totalQuestions, totalPercentage],
+            takenTests: true,
         })
 
         localStorage.setItem('localUserID', auth.currentUser.uid);
