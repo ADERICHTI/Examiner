@@ -426,7 +426,7 @@ function startTest() {
     
     
     // Set first subject
-    state.currentSubject = "EME 127 Test";
+    state.currentSubject = "DLC_EME_401_TEST";
     // Initialize user answers
     [state.currentSubject].forEach(subject => {
         try {
