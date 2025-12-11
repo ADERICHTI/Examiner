@@ -466,7 +466,7 @@ const hasTakenTest = await (async () => {
       try {
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${"EME 127"}</td>
+            <td>${"EME 401"}</td>
             <td>${userProfile.scores[0] || localUserProfile.scores[0]}/${userProfile.scores[1] || localUserProfile.scores[1]}</td>
             <td>${userProfile.scores[2] || localUserProfile.scores[2]}%</td>
         `;
