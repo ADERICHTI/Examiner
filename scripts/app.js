@@ -645,7 +645,7 @@ function calculateResults() {
         // Add to results table
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${"EME 127"}</td>
+            <td>${"EME 401"}</td>
             <td>${correct}/${questions.length}</td>
             <td>${percentage}%</td>
         `;
