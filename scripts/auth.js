@@ -29,24 +29,14 @@ import {
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-// const firebaseConfig = {
-//     apiKey: "AIzaSyBR2IsZYefv54lABlgF4QB9RsRKUpLaPuo",
-//     authDomain: "examiner-25.firebaseapp.com",
-//     projectId: "examiner-25",
-//     storageBucket: "examiner-25.firebasestorage.app",
-//     messagingSenderId: "414665642672",
-//     appId: "1:414665642672:web:7ee296a2fffdd51208a175",
-//     measurementId: "G-H0432JGGD9"
-// };
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyC1iB1X-qqbfB9hwHnZ8SyLWn_i1SU29iI",
-  authDomain: "vedatabase25.firebaseapp.com",
-  projectId: "vedatabase25",
-  storageBucket: "vedatabase25.firebasestorage.app",
-  messagingSenderId: "881280967764",
-  appId: "1:881280967764:web:3157268fffecb59620b9c1",
-  measurementId: "G-K01FTCLQVN"
+    apiKey: "AIzaSyBR2IsZYefv54lABlgF4QB9RsRKUpLaPuo",
+    authDomain: "examiner-25.firebaseapp.com",
+    projectId: "examiner-25",
+    storageBucket: "examiner-25.firebasestorage.app",
+    messagingSenderId: "414665642672",
+    appId: "1:414665642672:web:7ee296a2fffdd51208a175",
+    measurementId: "G-H0432JGGD9"
 };
 
 // Initialize Firebase
@@ -604,5 +594,4 @@ function hideAuthModal() {
 export { auth, setUser, doc, db, getDoc, serverTimestamp, getAuth, 
   GoogleAuthProvider, 
   signInWithPopup, 
-
   onAuthStateChanged, initializeApp, localUserProfileID };
