@@ -1,0 +1,350 @@
+/* --- App Container --- */
+#app-container {
+    width: 100%;
+    max-width: 420px;
+    background: white;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    position: relative;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
+}
+
+/* #pagesWrap just passes layout through on mobile/tablet */
+#pagesWrap {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+}
+
+#brandPanel { display: none; }
+
+/* Mobile: full-bleed, no card chrome */
+@media (max-width: 480px) {
+    #app-container {
+        border-radius: 0;
+        box-shadow: none;
+        max-width: 100%;
+    }
+}
+
+/* Tablet: cap height so it reads as a card, not a stretched sliver */
+@media (min-width: 481px) and (max-width: 1023px) {
+    #app-container {
+        height: min(850px, 100dvh - 40px);
+        border-radius: 32px;
+        margin: 20px auto;
+    }
+}
+
+/* Desktop: full-bleed split screen, brand panel + content panel */
+@media (min-width: 1024px) {
+    #app-container {
+        max-width: 100%;
+        height: 100dvh;
+        border-radius: 0;
+        box-shadow: none;
+        flex-direction: row;
+        margin: 0;
+    }
+
+    #brandPanel {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        width: 42%;
+        max-width: 520px;
+        min-width: 380px;
+        height: 100%;
+        padding: 56px 48px;
+        position: relative;
+        overflow: hidden;
+        color: white;
+        background: radial-gradient(120% 120% at 0% 0%, #3b82f6 0%, #1d4ed8 45%, #1e3a8a 100%);
+        flex-shrink: 0;
+    }
+    #brandPanel::before,
+    #brandPanel::after {
+        content: '';
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.08);
+    }
+    #brandPanel::before { width: 340px; height: 340px; top: -120px; right: -120px; }
+    #brandPanel::after { width: 240px; height: 240px; bottom: -80px; left: -80px; background: rgba(255,255,255,0.06); }
+
+    #pagesWrap {
+        flex: 1;
+        min-width: 0;
+        height: 100%;
+        background: #f8fafc;
+    }
+
+    .page {
+        max-width: 480px;
+        width: 100%;
+        margin: 0 auto;
+        padding: 56px 24px;
+        justify-content: center;
+    }
+    #page-submitted.page {
+        max-width: 560px;
+    }
+
+    /* Test in progress (or a full-screen empty/error state): hide the brand panel, use the full window */
+    #app-container.test-mode #brandPanel {
+        display: none;
+    }
+    #app-container.test-mode #page-test.page {
+        max-width: 1200px;
+        padding: 40px 56px;
+    }
+    #app-container.test-mode #questionArea {
+        display: grid;
+        grid-template-columns: 1fr 260px;
+        column-gap: 40px;
+        align-items: start;
+        padding: 40px;
+    }
+    #app-container.test-mode #questionText {
+        grid-column: 1;
+        font-size: 22px;
+    }
+    #app-container.test-mode #optionsContainer {
+        grid-column: 1;
+    }
+    #app-container.test-mode #questionNav {
+        display: block;
+        grid-column: 2;
+        grid-row: 1 / span 2;
+        border-left: 1px solid #e2e8f0;
+        padding-left: 28px;
+    }
+
+    /* Start Test: hero fills the screen edge-to-edge like #brandPanel does on
+       other pages; the form sits as a centered card on the right, like a
+       normal .page's content does next to #brandPanel. */
+    #app-container.test-mode #page-start.page {
+        max-width: 100%;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        justify-content: stretch;
+    }
+    #app-container.test-mode #startLayout {
+        display: grid;
+        grid-template-columns: 1fr 480px;
+        column-gap: 0;
+        align-items: stretch;
+        height: 100%;
+        width: 100%;
+    }
+    #app-container.test-mode #startInfo {
+        align-self: stretch;
+        height: 100%;
+        border-radius: 0;
+        padding: 56px 64px;
+    }
+    #app-container.test-mode #startInfo h3 {
+        font-size: 28px;
+    }
+    #app-container.test-mode #startFormCard {
+        align-self: center;
+        justify-self: center;
+        width: 100%;
+        max-width: 380px;
+        margin: 0 40px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 32px;
+    }
+}
+
+#startLayout {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    flex: 1;
+}
+
+.start-hero {
+    position: relative;
+    overflow: hidden;
+    border-radius: 20px;
+    padding: 32px 28px;
+    color: white;
+    background: radial-gradient(120% 120% at 0% 0%, #3b82f6 0%, #1d4ed8 45%, #1e3a8a 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.triangle-bg {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+}
+.triangle-bg .triangle {
+    position: absolute;
+    width: 0;
+    height: 0;
+}
+.triangle-bg .t1 { top: -50px; left: -40px; border-left: 110px solid transparent; border-right: 110px solid transparent; border-bottom: 190px solid rgba(255,255,255,0.08); transform: rotate(12deg); }
+.triangle-bg .t2 { bottom: 20px; right: -60px; border-left: 90px solid transparent; border-right: 90px solid transparent; border-bottom: 150px solid rgba(255,255,255,0.07); transform: rotate(-20deg); }
+.triangle-bg .t3 { top: 45%; left: 55%; border-left: 55px solid transparent; border-right: 55px solid transparent; border-bottom: 95px solid rgba(255,255,255,0.05); transform: rotate(48deg); }
+.triangle-bg .t4 { bottom: -60px; left: 15%; border-left: 130px solid transparent; border-right: 130px solid transparent; border-bottom: 210px solid rgba(255,255,255,0.06); transform: rotate(-8deg); }
+
+/* --- SPA Page --- */
+.page {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 24px;
+    overflow-y: auto;
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Custom Components --- */
+.btn-primary {
+    background: var(--gm-primary);
+    color: var(--gm-on-primary);
+    border-radius: var(--gm-radius-full);
+    padding: 14px 28px;
+    font-weight: 500;
+    transition: background 0.15s ease;
+    width: 100%;
+    text-align: center;
+}
+.btn-primary:hover { background: var(--gm-primary-dark); }
+.btn-primary:disabled { background: #94a3b8; box-shadow: none; cursor: not-allowed; }
+
+.input-field {
+    width: 100%;
+    border: 1px solid var(--gm-outline);
+    border-radius: 12px;
+    padding: 14px 16px;
+    outline: none;
+    transition: all 0.2s;
+    font-size: 15px;
+    background: var(--gm-surface-container);
+    color: var(--gm-on-surface);
+}
+.input-field:focus { border-color: var(--gm-primary); box-shadow: 0 0 0 3px rgba(11, 87, 208, 0.15); background: var(--gm-surface); }
+.input-field.error { border-color: #ef4444; }
+
+.option-btn {
+    width: 100%;
+    padding: 16px 16px 16px 20px;
+    border: 1px solid var(--gm-outline);
+    border-radius: 12px;
+    text-align: left;
+    background: var(--gm-surface);
+    transition: all 0.2s;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    color: var(--gm-on-surface);
+}
+.option-btn:hover { border-color: var(--gm-primary); background: var(--gm-secondary-container); }
+.option-btn.selected {
+    border-color: var(--gm-primary);
+    background: var(--gm-secondary-container);
+    color: var(--gm-on-secondary-container);
+    box-shadow: 0 0 0 1px var(--gm-primary);
+    border-left: 4px solid var(--gm-primary);
+}
+.option-btn .option-badge {
+    transition: all 0.2s;
+    background: var(--gm-surface-container);
+    color: var(--gm-on-surface-variant);
+}
+.option-btn.selected .option-badge {
+    background: var(--gm-primary);
+    color: white;
+}
+
+/* Timer */
+.test-timer {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gm-on-surface-variant);
+    background: var(--gm-surface-container);
+    padding: 6px 12px;
+    border-radius: var(--gm-radius-full);
+}
+.test-timer.warning { color: #b45309; background: #fef3c7; }
+.test-timer.danger { color: #b91c1c; background: #fee2e2; animation: pulse 1s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+/* Answered progress bar */
+.test-progress-track {
+    width: 100%;
+    height: 4px;
+    background: var(--gm-outline);
+    border-radius: var(--gm-radius-full);
+    overflow: hidden;
+    margin-bottom: 16px;
+    flex-shrink: 0;
+}
+.test-progress-fill {
+    height: 100%;
+    background: var(--gm-primary);
+    border-radius: var(--gm-radius-full);
+    transition: width 0.25s ease;
+}
+
+/* Question Navigator: desktop-only jump-to-question palette */
+#questionNav { display: none; }
+.question-nav-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--gm-on-surface-variant);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 14px;
+}
+.question-nav-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(36px, 1fr));
+    gap: 8px;
+}
+.question-nav-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--gm-outline);
+    background: var(--gm-surface);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gm-on-surface-variant);
+    cursor: pointer;
+    transition: all 0.15s;
+}
+.question-nav-btn:hover { border-color: var(--gm-primary); background: var(--gm-secondary-container); }
+.question-nav-btn.answered { background: #E6F4EA; border-color: #A8DAB5; color: #1E7E34; }
+.question-nav-btn.current { background: var(--gm-primary); border-color: var(--gm-primary); color: white; transform: scale(1.1); box-shadow: 0 0 0 3px rgba(11, 87, 208, 0.18); }
+
+/* Scoped Scrollbar */
+.page::-webkit-scrollbar { width: 4px; }
+.page::-webkit-scrollbar-track { background: transparent; }
+.page::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }

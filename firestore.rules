@@ -1,0 +1,75 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() &&
+        exists(/databases/$(database)/documents/admins/$(request.auth.token.email));
+    }
+
+    function isOwnUserDoc(email) {
+      return isSignedIn() && request.auth.token.email == email;
+    }
+
+    // A student's submission batch bumps tests/{testId}.submissionCount by
+    // exactly 1 and touches nothing else on the test doc - everything else
+    // about a test stays admin-only.
+    function isSubmissionCounterBump() {
+      return isSignedIn() &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['submissionCount', 'lastSubmissionAt']) &&
+        request.resource.data.submissionCount == resource.data.submissionCount + 1;
+    }
+
+    // Admin allowlist. Existence of the doc is the only signal that matters.
+    // Never writable from the client - seed via the emulator UI / firebase console.
+    // Every signed-in user must be able to check their OWN doc (that's how the
+    // client knows whether to show admin UI) - only admins can read others' or
+    // list the whole collection, so the allowlist itself isn't enumerable.
+    match /admins/{email} {
+      allow get: if isSignedIn() && (request.auth.token.email == email || isAdmin());
+      allow list: if isAdmin();
+      allow write: if false;
+    }
+
+    // Test metadata, created/edited/deleted by admins. Must be signed in to read,
+    // matching "redirect to auth before anything else" in the routing rules.
+    match /tests/{testId} {
+      allow read: if isSignedIn();
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin() || isSubmissionCounterBump();
+
+      // tests/{testId}/submissions/{studentId_time} - one doc per attempt.
+      match /submissions/{submissionId} {
+        allow read: if isSignedIn();
+
+        allow create: if isSignedIn() &&
+          request.resource.data.userEmail == request.auth.token.email &&
+          request.resource.data.testTaken == false;
+
+        // Only the student who started it can submit, only while it's still
+        // unsubmitted - prevents re-submitting or editing someone else's record.
+        allow update: if isAdmin() || (
+          isSignedIn() &&
+          resource.data.userEmail == request.auth.token.email &&
+          resource.data.testTaken == false &&
+          request.resource.data.userEmail == resource.data.userEmail
+        );
+
+        allow delete: if isAdmin();
+      }
+    }
+
+    // users/{email} - doc id is the signed-in user's email, per spec. Admins
+    // can also write here (needed to clear testsTaken when they delete a
+    // student's submission from the admin page).
+    match /users/{email} {
+      allow read, write: if isOwnUserDoc(email);
+      allow read, write: if isAdmin();
+    }
+  }
+}

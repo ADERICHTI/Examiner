@@ -1,0 +1,86 @@
+
+Deployment target:
+- Firebase Hosting
+- Deploy command: firebase deploy --only hosting:iyiola-cbt
+
+
+You are working on the Examiner CBT app.
+
+Goal: implement the app behavior and admin system described below, using the existing codebase(in old template, scripts, home.html) as the source of truth.
+
+First, study how the old Examiner application worked.
+- Check utility/config for Firebase configuration.
+- Reuse existing app patterns where possible.
+
+Routing and authentication rules:
+- If a URL includes a test id query value, preserve that id across navigation.
+- If the user is not logged in, redirect them to the auth page.
+- When the user is signed in, their email is the document id in the users collection.
+- For authenticated users, check the testsTaken object in their user document.
+- If testsTaken contains the current test id and its value is true, redirect the user to the submissions page.
+- If the test id is not present in testsTaken, or its value is false, continue with the normal test flow.
+
+Student test-start rules:
+- When an authenticated user enters a student id and name and clicks Start Test:
+  - Check the {testid} collection for a document whose doc id is the student id.
+  - That document is created when the user starts the test successfully.
+  - Its testTaken field starts as false.
+  - If the document exists and testTaken is true, redirect the user to the submissions page(telling the user a submission as been made under that id for this test).
+  - Otherwise keep the user on the normal test page so they can take the test.
+
+Test data rules:
+- There is a tests collection that stores metadata for every test created by the admin.
+- Each test id for every test created by the admin should be the admin-entered id plus a random unique suffix, for example vg63f127.(during creation)
+- This collection is where the id query value in the URL is verified.
+
+Admin system requirements:
+Build a full admin section that works on both desktop and mobile in fullscreen layout.
+
+Admin capabilities:
+- Create a new test.
+- Upload questions in CSV or JSON format.
+- Set a time limit.
+- Set a display name for the test, separate from the test id.
+- Edit uploaded questions later in a spreadsheet-like interface on a separate admin page.
+- Edit the time limit and display name, but never the test id.
+- Enable or disable a test.
+- Delete a test only after the admin types the test id to confirm.
+- View submissions for a test in both list view and spreadsheet-like view.
+- Add filters to the submission views.
+- Allow submissions to be downloaded as CSV.
+
+Admin pages:
+1. Dashboard
+- Show metrics:
+  - total number of tests
+  - total number of submissions
+  - active tests
+  - disabled tests
+- Show recents:
+  - submissions
+  - tests created
+  - tests edited
+- Recents should be filterable by time.
+
+2. Tests list
+- Show all created tests with their metadata.
+- Each test card should be collapsible.
+- Clicking a test should open its dedicated admin test page at admin/testid.
+
+3. Admin test detail page
+- Show the test metadata in a polished, attractive, educational presentation.
+- Show submissions underneath in a list.
+- Include a toggle between list view and spreadsheet view.
+- Include filters.
+- Include a download button.
+
+Start page design:
+- Return the start page to the blue design from the left side reference.
+- Use unique wording, not the original copy.
+- Add faded triangle shapes in the background.
+
+Implementation expectations:
+- Keep the current app working while adding the new admin and routing behavior.
+- Follow the existing Firebase and app architecture as arefernce not strictly though, incase it falls short.
+- Prefer clean, maintainable code over quick hacks.
+- If any current behavior conflicts with these requirements, fix the root cause.

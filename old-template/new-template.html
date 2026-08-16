@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Examiner</title>
+    
+    <!-- Tailwind CSS for Layout -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- Base Styles --- */
+        html, body {
+            height: 100%;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100dvh;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* --- App Container --- */
+        #app-container {
+            width: 100%;
+            max-width: 420px;
+            background: white;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            position: relative;
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* #pagesWrap just passes layout through on mobile/tablet */
+        #pagesWrap {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            min-width: 0;
+        }
+
+        #brandPanel { display: none; }
+
+        /* Mobile: full-bleed, no card chrome */
+        @media (max-width: 480px) {
+            #app-container {
+                border-radius: 0;
+                box-shadow: none;
+                max-width: 100%;
+            }
+        }
+
+        /* Tablet: cap height so it reads as a card, not a stretched sliver */
+        @media (min-width: 481px) and (max-width: 1023px) {
+            body { padding: 20px; }
+            #app-container {
+                height: min(850px, 100dvh - 40px);
+                border-radius: 32px;
+            }
+        }
+
+        /* Desktop: full-bleed split screen, brand panel + content panel */
+        @media (min-width: 1024px) {
+            body { padding: 0; }
+            #app-container {
+                max-width: 100%;
+                height: 100dvh;
+                border-radius: 0;
+                box-shadow: none;
+                flex-direction: row;
+            }
+
+            #brandPanel {
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                width: 42%;
+                max-width: 520px;
+                min-width: 380px;
+                height: 100%;
+                padding: 56px 48px;
+                position: relative;
+                overflow: hidden;
+                color: white;
+                background: radial-gradient(120% 120% at 0% 0%, #3b82f6 0%, #1d4ed8 45%, #1e3a8a 100%);
+                flex-shrink: 0;
+            }
+            #brandPanel::before,
+            #brandPanel::after {
+                content: '';
+                position: absolute;
+                border-radius: 50%;
+                background: rgba(255,255,255,0.08);
+            }
+            #brandPanel::before { width: 340px; height: 340px; top: -120px; right: -120px; }
+            #brandPanel::after { width: 240px; height: 240px; bottom: -80px; left: -80px; background: rgba(255,255,255,0.06); }
+
+            #pagesWrap {
+                flex: 1;
+                min-width: 0;
+                height: 100%;
+                background: #f8fafc;
+            }
+
+            .page {
+                max-width: 480px;
+                width: 100%;
+                margin: 0 auto;
+                padding: 56px 24px;
+                justify-content: center;
+            }
+            #page-submitted.page {
+                max-width: 560px;
+            }
+
+            /* Test in progress: hide the brand panel, use the full window */
+            #app-container.test-mode #brandPanel {
+                display: none;
+            }
+            #app-container.test-mode #page-test.page {
+                max-width: 1200px;
+                padding: 40px 56px;
+            }
+            #app-container.test-mode #questionArea {
+                display: grid;
+                grid-template-columns: 1fr 260px;
+                column-gap: 40px;
+                align-items: start;
+                padding: 40px;
+            }
+            #app-container.test-mode #questionText {
+                grid-column: 1;
+                font-size: 22px;
+            }
+            #app-container.test-mode #optionsContainer {
+                grid-column: 1;
+            }
+            #app-container.test-mode #questionNav {
+                display: block;
+                grid-column: 2;
+                grid-row: 1 / span 2;
+                border-left: 1px solid #e2e8f0;
+                padding-left: 28px;
+            }
+        }
+
+        /* --- SPA Page Management --- */
+        .page {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            padding: 24px;
+            overflow-y: auto;
+            animation: fadeIn 0.3s ease-out;
+        }
+        .page.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- Custom Components --- */
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+            border-radius: 12px;
+            padding: 14px 24px;
+            font-weight: 600;
+            transition: all 0.2s;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+        }
+        .btn-primary:hover { background: #1d4ed8; transform: translateY(-1px); }
+        .btn-primary:disabled { background: #94a3b8; box-shadow: none; transform: none; cursor: not-allowed; }
+
+        .input-field {
+            width: 100%;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 14px 16px;
+            outline: none;
+            transition: all 0.2s;
+            font-size: 15px;
+            background: #f8fafc;
+        }
+        .input-field:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); background: white; }
+        .input-field.error { border-color: #ef4444; }
+
+        .option-btn {
+            width: 100%;
+            padding: 16px 16px 16px 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            text-align: left;
+            background: white;
+            transition: all 0.2s;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .option-btn:hover { border-color: #93c5fd; background: #f0f9ff; }
+        .option-btn.selected { border-color: #2563eb; background: #eff6ff; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+        .option-btn.selected {
+            border-left: 4px solid #2563eb;
+        }
+        .option-btn .option-badge {
+            transition: all 0.2s;
+        }
+        .option-btn.selected .option-badge {
+            background: #2563eb;
+            color: white;
+        }
+
+        /* Timer */
+        .test-timer {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #475569;
+            background: #f1f5f9;
+            padding: 6px 12px;
+            border-radius: 999px;
+        }
+        .test-timer.warning { color: #b45309; background: #fef3c7; }
+        .test-timer.danger { color: #b91c1c; background: #fee2e2; animation: pulse 1s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+        /* Answered progress bar */
+        .test-progress-track {
+            width: 100%;
+            height: 4px;
+            background: #e2e8f0;
+            border-radius: 999px;
+            overflow: hidden;
+            margin-bottom: 16px;
+            flex-shrink: 0;
+        }
+        .test-progress-fill {
+            height: 100%;
+            background: #2563eb;
+            border-radius: 999px;
+            transition: width 0.25s ease;
+        }
+
+        /* Question Navigator: desktop-only jump-to-question palette */
+        #questionNav { display: none; }
+        .question-nav-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 14px;
+        }
+        .question-nav-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(36px, 1fr));
+            gap: 8px;
+        }
+        .question-nav-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1px solid #e2e8f0;
+            background: white;
+            font-size: 13px;
+            font-weight: 600;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .question-nav-btn:hover { border-color: #93c5fd; background: #f0f9ff; }
+        .question-nav-btn.answered { background: #dcfce7; border-color: #86efac; color: #16a34a; }
+        .question-nav-btn.current { background: #2563eb; border-color: #2563eb; color: white; transform: scale(1.1); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
+
+        /* Scoped Scrollbar */
+        .page::-webkit-scrollbar { width: 4px; }
+        .page::-webkit-scrollbar-track { background: transparent; }
+        .page::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        /* Loader */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #2563eb;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <!-- Main App Container -->
+    <div id="app-container">
+
+        <!-- Desktop-only brand / info panel -->
+        <aside id="brandPanel">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 bg-white/15 rounded-xl flex items-center justify-center text-xl backdrop-blur-sm">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <span class="text-lg font-bold tracking-tight">Examiner</span>
+            </div>
+
+            <div class="relative z-10">
+                <h2 class="text-4xl font-extrabold leading-tight mb-4">Test smarter,<br>not harder.</h2>
+                <p class="text-blue-100/90 text-sm leading-relaxed max-w-xs">
+                    A focused, distraction-free environment for taking your assessments online — built for accuracy and speed.
+                </p>
+
+                <ul class="mt-10 space-y-4">
+                    <li class="flex items-center gap-3 text-sm text-blue-50">
+                        <span class="w-8 h-8 rounded-lg bg-white/15 flex items-center justify-center backdrop-blur-sm"><i class="fa-solid fa-bolt"></i></span>
+                        Instant, automatic grading
+                    </li>
+                    <li class="flex items-center gap-3 text-sm text-blue-50">
+                        <span class="w-8 h-8 rounded-lg bg-white/15 flex items-center justify-center backdrop-blur-sm"><i class="fa-solid fa-shield-halved"></i></span>
+                        Secure, single-attempt exams
+                    </li>
+                    <li class="flex items-center gap-3 text-sm text-blue-50">
+                        <span class="w-8 h-8 rounded-lg bg-white/15 flex items-center justify-center backdrop-blur-sm"><i class="fa-solid fa-chart-line"></i></span>
+                        Clear results the moment you finish
+                    </li>
+                </ul>
+            </div>
+
+            <p class="relative z-10 text-xs text-blue-100/70">&copy; 2026 Examiner. All rights reserved.</p>
+        </aside>
+
+        <div id="pagesWrap">
+
+        <!-- ================= PAGE 1: LOGIN (Matches Page 2 of image) ================= -->
+        <div id="page-login" class="page active">
+            <div class="flex-1 flex flex-col justify-center max-w-sm mx-auto w-full">
+                <div class="mb-10 text-center">
+                    <div class="w-16 h-16 bg-blue-0 rounded-2xl flex items-center justify-center text-blue-600 text-2xl font-bold mx-auto mb-4 shadow-lg shadow-blue-50">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                    </div>
+                    <h1 class="text-3xl font-bold text-slate-800">Welcome back,</h1>
+                    <p class="text-slate-500 text-sm mt-1">Please enter your details to sign in.</p>
+                </div>
+
+                <form id="loginForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Email address</label>
+                        <input type="email" id="loginEmail" class="input-field" placeholder="johndoe@example.com" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Password</label>
+                        <input type="password" id="loginPass" class="input-field" placeholder="••••••••" required>
+                    </div>
+                    <div class="flex justify-end">
+                        <a href="#" class="text-sm font-medium text-blue-600 hover:text-blue-800">Forgot password?</a>
+                    </div>
+                    <button type="submit" class="btn-primary mt-2">Sign In</button>
+                    
+                    <div class="relative my-6">
+                        <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-200"></div></div>
+                        <div class="relative flex justify-center text-sm"><span class="px-2 bg-white text-slate-500">Or continue with</span></div>
+                    </div>
+
+                    <div class="flex gap-4">
+                        <button type="button" class="flex-1 py-3 border border-gray-200 rounded-xl flex justify-center items-center gap-2 hover:bg-gray-50 transition-colors text-slate-600">
+                            <i class="fa-brands fa-google"></i> Google
+                        </button>
+                        <button type="button" class="flex-1 py-3 border border-gray-200 rounded-xl flex justify-center items-center gap-2 hover:bg-gray-50 transition-colors text-slate-600">
+                            <i class="fa-brands fa-facebook-f"></i> Facebook
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="text-center mt-6 text-sm text-slate-500">
+                Don't have an account? <a href="#" class="text-blue-600 font-medium">Sign up</a>
+            </div>
+        </div>
+
+        <!-- ================= PAGE 2: START TEST (Matches Page 7 layout) ================= -->
+        <div id="page-start" class="page">
+            <div class="flex items-center gap-4 mb-6 border-b border-gray-100 pb-4">
+                <button onclick="navigateTo('login')" class="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-slate-600 hover:bg-gray-50 transition-colors">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <h2 class="text-xl font-bold text-slate-800">Start Test</h2>
+            </div>
+
+            <div class="flex-1 flex flex-col">
+                <!-- Top Progress Bar (Simulated loading on scroll) -->
+                <div class="w-full h-2 bg-gray-200 rounded-full mb-6 overflow-hidden sticky top-0 z-10 bg-white pb-2">
+                    <div id="startProgressBar" class="h-full bg-blue-600 rounded-full transition-all duration-300" style="width: 0%;"></div>
+                </div>
+
+                <h3 class="text-lg font-bold text-slate-800 mb-1">Physics 101: Mechanics</h3>
+                <p class="text-sm text-slate-500 mb-6">10 Questions • 15 Minutes</p>
+
+                <div class="bg-blue-50 border border-blue-100 p-4 rounded-xl mb-6 flex gap-3">
+                    <i class="fa-solid fa-circle-info text-blue-600 mt-1"></i>
+                    <div>
+                        <h4 class="text-sm font-semibold text-blue-800">Instructions</h4>
+                        <p class="text-xs text-blue-700/80">Read each question carefully. Select the best answer. You cannot retake this test once started.</p>
+                    </div>
+                </div>
+
+                <div class="space-y-4 mb-6">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Full Name</label>
+                        <input type="text" id="studentName" class="input-field" placeholder="Enter your full name" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-1">Student ID</label>
+                        <input type="text" id="studentId" class="input-field" placeholder="Enter your Student ID" required>
+                    </div>
+                </div>
+
+                <div class="mt-auto pt-4">
+                    <button id="beginTestBtn" class="btn-primary flex items-center justify-center gap-2">
+                        Begin Test <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= PAGE 3: TEST INTERFACE (Matches Page 14/15) ================= -->
+        <div id="page-test" class="page">
+            <div class="flex justify-between items-center mb-4">
+                <div class="flex items-center gap-3">
+                    <button onclick="confirmExit()" class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-slate-600 hover:bg-gray-200 transition-colors">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                    <span class="text-sm font-bold text-slate-700">Quiz</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div id="testTimer" class="test-timer">
+                        <i class="fa-regular fa-clock"></i> <span id="timerText">15:00</span>
+                    </div>
+                    <div class="text-sm font-semibold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
+                        <span id="questionCounter">1</span>/<span id="totalQuestions">10</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Answered progress -->
+            <div class="test-progress-track">
+                <div id="testProgressFill" class="test-progress-fill" style="width: 0%;"></div>
+            </div>
+
+            <!-- Question Area -->
+            <div id="questionArea" class="flex-1 flex flex-col bg-gray-50 rounded-2xl p-5 mb-4 relative">
+                <h3 id="questionText" class="text-lg font-bold text-slate-800 leading-relaxed mb-6">Loading question...</h3>
+
+                <div id="optionsContainer" class="space-y-2 flex-1">
+                    <!-- Options injected by JS -->
+                </div>
+
+                <!-- Question Navigator (desktop only: jump to any question) -->
+                <div id="questionNav">
+                    <h4 class="question-nav-title">Questions</h4>
+                    <div id="questionNavGrid" class="question-nav-grid">
+                        <!-- Number buttons injected by JS -->
+                    </div>
+                </div>
+
+                <!-- Modal Overlay (For Submit Confirmation - Page 15 style) -->
+                <div id="submitModal" class="absolute inset-0 bg-black/5 backdrop-blur-sm rounded-2xl z-20 hidden flex items-center justify-center p-6">
+                    <div class="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl">
+                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-xl mx-auto mb-3">
+                            <i class="fa-regular fa-clock"></i>
+                        </div>
+                        <h4 class="text-center font-bold text-slate-800 text-lg">Submit Exam?</h4>
+                        <p class="text-center text-sm text-slate-500 mb-6">Are you sure you want to submit? You cannot retake this test.</p>
+                        <div class="flex gap-3">
+                            <button onclick="toggleModal(false)" class="flex-1 py-3 border border-gray-200 rounded-xl text-slate-600 font-medium hover:bg-gray-50">No</button>
+                            <button id="confirmSubmitBtn" class="flex-1 py-3 bg-blue-600 text-white rounded-xl font-medium shadow-md shadow-blue-200 hover:bg-blue-700">Yes, Submit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Controls -->
+            <div class="flex gap-3">
+                <button id="prevBtn" class="flex-1 py-3 border border-gray-200 rounded-xl text-slate-600 font-medium hover:bg-gray-50 disabled:opacity-50 disabled:hover:bg-white" disabled>
+                    <i class="fa-solid fa-chevron-left mr-2"></i> Previous
+                </button>
+                <button id="nextBtn" class="flex-1 py-3 bg-blue-600 text-white rounded-xl font-medium shadow-md shadow-blue-200 hover:bg-blue-700 disabled:opacity-50 disabled:hover:bg-blue-600 disabled:cursor-not-allowed">
+                    Next <i class="fa-solid fa-chevron-right ml-2"></i>
+                </button>
+                <button id="submitBtn" onclick="toggleModal(true)" class="flex-1 py-3 bg-slate-800 text-white rounded-xl font-medium shadow-md hover:bg-slate-900">
+                    Submit <i class="fa-regular fa-paper-plane ml-2"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- ================= PAGE 4: SUBMISSION SUCCESS ================= -->
+        <div id="page-submitted" class="page items-center justify-center text-center">
+            <div class="max-w-sm">
+                <div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center text-green-600 text-5xl mx-auto mb-6 shadow-lg shadow-green-200">
+                    <i class="fa-solid fa-check"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-slate-800 mb-2">Submission Successful!</h2>
+                <p class="text-slate-500 mb-8 text-sm leading-relaxed">
+                    Your test has been successfully submitted. 
+                    <br><br>
+                    <span class="font-semibold text-slate-700 text-base">You cannot retake this test again.</span> 
+                    Please contact your administrator if you believe this is an error.
+                </p>
+
+                <!-- User should remain on the submission page after submitting the test, as they cannot retake it. The "Back to Home" button is commented out to prevent navigation away from this page. -->
+
+                <!-- <button onclick="navigateTo('login')" class="btn-primary max-w-[200px] mx-auto block shadow-lg shadow-blue-200">
+                    <i class="fa-solid fa-house mr-2"></i> Back to Home
+                </button> -->
+            </div>
+        </div>
+
+        </div>
+
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // --- App State ---
+        const state = {
+            isLoggedIn: false,
+            testStarted: false,
+            testCompleted: false, // Locks the test permanently
+            currentQuestionIndex: 0,
+            userAnswers: {},
+        };
+
+        // --- Mock Data ---
+        const questions = [
+            { id: 1, text: "What is the SI unit of force?", options: ["Newton", "Joule", "Watt", "Pascal"] },
+            { id: 2, text: "What is the chemical symbol for water?", options: ["H2O", "CO2", "NaCl", "O2"] },
+            { id: 3, text: "What planet is known as the Red Planet?", options: ["Venus", "Jupiter", "Mars", "Saturn"] },
+            { id: 4, text: "What is the square root of 144?", options: ["10", "11", "12", "13"] },
+            { id: 5, text: "Which gas do plants primarily absorb from the atmosphere?", options: ["Oxygen", "Nitrogen", "Carbon Dioxide", "Argon"] },
+        ];
+        // Duplicate questions to make it feel like 10 questions for the bar
+        const fullQuestions = [...questions, ...questions]; 
+
+        // --- DOM Elements ---
+        const pages = {
+            login: document.getElementById('page-login'),
+            start: document.getElementById('page-start'),
+            test: document.getElementById('page-test'),
+            submitted: document.getElementById('page-submitted')
+        };
+
+        const startProgressBar = document.getElementById('startProgressBar');
+        const beginTestBtn = document.getElementById('beginTestBtn');
+        const questionText = document.getElementById('questionText');
+        const optionsContainer = document.getElementById('optionsContainer');
+        const questionCounter = document.getElementById('questionCounter');
+        const totalQuestions = document.getElementById('totalQuestions');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const submitModal = document.getElementById('submitModal');
+        const confirmSubmitBtn = document.getElementById('confirmSubmitBtn');
+        const questionNavGrid = document.getElementById('questionNavGrid');
+        const testProgressFill = document.getElementById('testProgressFill');
+        const testTimerEl = document.getElementById('testTimer');
+        const timerText = document.getElementById('timerText');
+
+        // --- Timer ---
+        const TEST_DURATION_SECONDS = 0.5 * 60;
+        let timerInterval = null;
+        let timeRemaining = TEST_DURATION_SECONDS;
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timeRemaining = TEST_DURATION_SECONDS;
+            updateTimerDisplay();
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                updateTimerDisplay();
+                if(timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    state.testCompleted = true;
+                    navigateTo('submitted');
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+        }
+
+        function updateTimerDisplay() {
+            const m = Math.floor(timeRemaining / 60);
+            const s = timeRemaining % 60;
+            timerText.textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
+
+            testTimerEl.classList.toggle('danger', timeRemaining <= 120);
+            testTimerEl.classList.toggle('warning', timeRemaining > 120 && timeRemaining <= 300);
+        }
+
+        // --- Question Navigator (desktop palette) ---
+        function renderQuestionNav() {
+            questionNavGrid.innerHTML = '';
+            fullQuestions.forEach((_, idx) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.textContent = idx + 1;
+                const isCurrent = idx === state.currentQuestionIndex;
+                const isAnswered = state.userAnswers[idx] !== undefined;
+                btn.className = `question-nav-btn ${isCurrent ? 'current' : ''} ${!isCurrent && isAnswered ? 'answered' : ''}`;
+                btn.onclick = () => {
+                    state.currentQuestionIndex = idx;
+                    loadQuestion();
+                };
+                questionNavGrid.appendChild(btn);
+            });
+        }
+
+        // --- Navigation System ---
+        function navigateTo(pageName) {
+            Object.keys(pages).forEach(key => {
+                pages[key].classList.remove('active');
+            });
+            pages[pageName].classList.add('active');
+
+            // Test page runs full-screen (no brand panel / width cap) to remove distraction
+            document.getElementById('app-container').classList.toggle('test-mode', pageName === 'test');
+
+            // Reset start page progress if going back
+            if(pageName === 'start' && !state.testStarted) {
+                startProgressBar.style.width = '0%';
+            }
+        }
+
+        // --- Login Logic ---
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            state.isLoggedIn = true;
+            navigateTo('start');
+        });
+
+        // --- Start Test Logic ---
+        let startPageScrollHandler = null;
+
+        document.getElementById('page-start').addEventListener('scroll', (e) => {
+            if(state.testStarted) return; // Don't animate if they already started
+
+            const el = e.target;
+            const scrollTop = el.scrollTop;
+            const scrollHeight = el.scrollHeight - el.clientHeight;
+            
+            if(scrollHeight > 0) {
+                const percentage = (scrollTop / scrollHeight) * 100;
+                startProgressBar.style.width = Math.min(percentage, 100) + '%';
+            }
+        });
+
+        beginTestBtn.addEventListener('click', () => {
+            const name = document.getElementById('studentName').value.trim();
+            const id = document.getElementById('studentId').value.trim();
+
+            if(!name || !id) {
+                alert("Please fill in both your Name and Student ID to begin.");
+                return;
+            }
+
+            if(state.testCompleted) {
+                alert("You have already completed this test and cannot retake it.");
+                return;
+            }
+
+            state.testStarted = true;
+            state.currentQuestionIndex = 0;
+            state.userAnswers = {};
+            startProgressBar.style.width = '100%'; // Fill up the bar before navigating
+            setTimeout(() => {
+                loadQuestion();
+                navigateTo('test');
+                startTimer();
+            }, 300);
+        });
+
+        // --- Test Interface Logic ---
+        function loadQuestion() {
+            const q = fullQuestions[state.currentQuestionIndex];
+            questionText.innerText = q.text;
+            questionCounter.innerText = state.currentQuestionIndex + 1;
+            totalQuestions.innerText = fullQuestions.length;
+
+            // Render Options
+            optionsContainer.innerHTML = '';
+            q.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = `option-btn ${state.userAnswers[state.currentQuestionIndex] === opt ? 'selected' : ''}`;
+                btn.innerHTML = `
+                    <span class="option-badge w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-xs font-semibold text-slate-500">${String.fromCharCode(65 + index)}</span>
+                    <span>${opt}</span>
+                `;
+                btn.onclick = () => selectOption(opt, btn);
+                optionsContainer.appendChild(btn);
+            });
+
+            // Update Navigation Buttons
+            prevBtn.disabled = state.currentQuestionIndex === 0;
+            nextBtn.disabled = state.currentQuestionIndex === fullQuestions.length - 1;
+
+            renderQuestionNav();
+            updateTestProgress();
+        }
+
+        function selectOption(option, btnElement) {
+            // UI Selection
+            document.querySelectorAll('.option-btn').forEach(el => el.classList.remove('selected'));
+            btnElement.classList.add('selected');
+
+            // State Save
+            state.userAnswers[state.currentQuestionIndex] = option;
+            renderQuestionNav();
+            updateTestProgress();
+        }
+
+        function updateTestProgress() {
+            const answeredCount = Object.keys(state.userAnswers).length;
+            const pct = Math.round((answeredCount / fullQuestions.length) * 100);
+            testProgressFill.style.width = pct + '%';
+        }
+
+        function nextQuestion() {
+            if(!state.userAnswers[state.currentQuestionIndex]) {
+                alert("Please select an option before proceeding.");
+                return;
+            }
+            if(state.currentQuestionIndex < fullQuestions.length - 1) {
+                state.currentQuestionIndex++;
+                loadQuestion();
+            }
+        }
+
+        prevBtn.addEventListener('click', () => {
+            if(state.currentQuestionIndex > 0) {
+                state.currentQuestionIndex--;
+                loadQuestion();
+            }
+        });
+
+        nextBtn.addEventListener('click', nextQuestion);
+
+        // --- Modal & Submit Logic ---
+        function toggleModal(show) {
+            if(show) {
+                submitModal.classList.remove('hidden');
+            } else {
+                submitModal.classList.add('hidden');
+            }
+        }
+
+        confirmSubmitBtn.addEventListener('click', () => {
+            state.testCompleted = true; // Permanent Lock
+            stopTimer();
+            toggleModal(false);
+            navigateTo('submitted');
+        });
+
+        function confirmExit() {
+            if(confirm("Are you sure you want to exit? Your progress will be lost.")) {
+                stopTimer();
+                navigateTo('start');
+                state.testStarted = false; // Reset progress so they can restart
+                state.currentQuestionIndex = 0;
+                state.userAnswers = {};
+                startProgressBar.style.width = '0%';
+            }
+        }
+
+        // --- Initialize App ---
+        // Ensure the test cannot be accessed if not logged in / test not started
+        // (Done via navigation flow. The start page protects the test page)
+    </script>
+</body>
+</html>

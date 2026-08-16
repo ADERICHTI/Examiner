@@ -1,0 +1,131 @@
+.chart-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.edge-circle {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    position: relative;
+    background: conic-gradient(
+       #aaaaaa 0deg 360deg   /* Male: (7/34)*360 = 74° */
+    );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.edge-circle::before {
+    content: '';
+    position: absolute;
+    width: 160px;
+    height: 160px;
+    background: white;
+    border-radius: 50%;
+    z-index: 1;
+}
+
+body.dark-mode .edge-circle::before {
+    background: #111111ff;
+}
+
+.circle-info {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+}
+
+.circle-value {
+    display: block;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.circle-label {
+    font-size: 14px;
+    color: #666;
+}
+
+body.dark-mode .circle-value, body.dark-mode .circle-label {
+    color: #f3f3f3;
+}
+
+.legend {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 3px;
+    margin-top: 20px;
+    max-height: 80px;
+    overflow: scroll;
+}
+
+.legend::-webkit-scrollbar {
+    width: 0;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin: 5px 0;
+}
+
+.color {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    margin-right: 10px;
+}
+
+.color.empty { background: #aaaaaa; }
+
+
+.progress-bar {
+    margin-top: 20px;
+    width: 100%;
+    height: 30px;
+    background: #f0f0f0;
+    border-radius: 15px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.progress-fill {
+    height: 100%;
+    background-color: #4ecdc4;
+    border-radius: 15px;
+    transition: width 0.5s ease-in-out;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.progress-text {
+    color: white;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
+}
+
+.progress-controls {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+}
+
+.progress-controls button {
+    padding: 5px 15px;
+    border: none;
+    background: #4ecdc4;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.progress-controls button:hover {
+    background: #44a08d;
+}
