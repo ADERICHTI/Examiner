@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { deleteSubmission, deleteTest, getTest, listSubmissionsForTest, updateTest } from '../../services/firestore';
 import {
   ALLOWED_USERS_CSV_TEMPLATE,
+  allowedUsersToCsv,
   copyToClipboard,
   downloadCsv,
   normalizeAllowedUser,
@@ -30,6 +31,7 @@ export default function TestDetail() {
   const [minutes, setMinutes] = useState(0);
   const [togglingActive, setTogglingActive] = useState(false);
   const [togglingStrict, setTogglingStrict] = useState(false);
+  const [togglingRestrict, setTogglingRestrict] = useState(false);
   const [saving, setSaving] = useState(false);
 
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -102,6 +104,20 @@ export default function TestDetail() {
       await reload();
     } finally {
       setTogglingStrict(false);
+    }
+  }
+
+  // Older tests never wrote restrictAccess - infer "on" from a non-empty
+  // list so their existing behavior doesn't silently change.
+  const restrictAccess = test?.restrictAccess ?? Boolean(test?.allowedUsers?.length);
+
+  async function toggleRestrictAccess() {
+    setTogglingRestrict(true);
+    try {
+      await updateTest(testId, { restrictAccess: !restrictAccess, updatedBy: user.email });
+      await reload();
+    } finally {
+      setTogglingRestrict(false);
     }
   }
 
@@ -201,6 +217,10 @@ export default function TestDetail() {
     setAllowedRows((test.allowedUsers ?? []).map((u, i) => normalizeAllowedUser(u, i)));
     setAllowedParseError('');
     setAccessEditing(false);
+  }
+
+  function handleDownloadAllowedCsv() {
+    downloadCsv(`${testId}-allowed-users.csv`, allowedUsersToCsv(test.allowedUsers));
   }
 
   function handleDownloadCsv() {
@@ -323,17 +343,40 @@ export default function TestDetail() {
             <h2 className="text-lg font-medium text-[#1F1F1F]">Access Restriction</h2>
           </button>
           {!accessEditing && (
-            <button onClick={() => { setAccessOpen(true); setAccessEditing(true); }} className="gpill gpill-neutral">
-              <i className="fa-solid fa-pen"></i> Edit
-            </button>
+            <div className="flex items-center gap-2 flex-wrap">
+              <button
+                type="button"
+                onClick={toggleRestrictAccess}
+                disabled={togglingRestrict || (!restrictAccess && !test.allowedUsers?.length)}
+                title={!restrictAccess && !test.allowedUsers?.length ? 'Add students to the list before turning restriction on' : ''}
+                className={`gpill disabled:opacity-70 disabled:cursor-not-allowed ${restrictAccess ? 'gpill-success' : 'gpill-neutral'}`}
+              >
+                {togglingRestrict ? (
+                  <i className="fa-solid fa-circle-notch fa-spin text-[10px]"></i>
+                ) : (
+                  <span className={`w-1.5 h-1.5 rounded-full ${restrictAccess ? 'bg-[#1E7E34]' : 'bg-[#444746]'}`}></span>
+                )}
+                Restriction {restrictAccess ? 'On' : 'Off'}
+              </button>
+              {test.allowedUsers?.length > 0 && (
+                <button onClick={handleDownloadAllowedCsv} className="gpill gpill-neutral">
+                  <i className="fa-solid fa-download"></i> CSV
+                </button>
+              )}
+              <button onClick={() => { setAccessOpen(true); setAccessEditing(true); }} className="gpill gpill-neutral">
+                <i className="fa-solid fa-pen"></i> Edit
+              </button>
+            </div>
           )}
         </div>
 
         {accessOpen && (!accessEditing ? (
           <>
             <p className="text-sm text-[#444746] mt-1">
-              {test.allowedUsers?.length ? (
+              {restrictAccess && test.allowedUsers?.length ? (
                 <><span className="font-semibold text-[#1F1F1F]">{test.allowedUsers.length} student{test.allowedUsers.length === 1 ? '' : 's'}</span> may start this test — everyone else is blocked.</>
+              ) : test.allowedUsers?.length ? (
+                <>Restriction is off — anyone with the link may start, even though <span className="font-semibold text-[#1F1F1F]">{test.allowedUsers.length} saved student{test.allowedUsers.length === 1 ? '' : 's'}</span> would apply if turned on.</>
               ) : (
                 'Open to anyone with the link.'
               )}

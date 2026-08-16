@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import StatTile from '../../components/StatTile';
+import { useToast } from '../../context/ToastContext';
 import { listRecentSubmissions, listRecentlyCreatedTests, listRecentlyEditedTests, listTests } from '../../services/firestore';
 
 const RANGE_OPTIONS = [
@@ -34,6 +35,7 @@ function timeAgo(date) {
 }
 
 export default function Dashboard() {
+  const toast = useToast();
   const [loading, setLoading] = useState(true);
   const [tests, setTests] = useState([]);
   const [recentSubmissions, setRecentSubmissions] = useState([]);
@@ -43,19 +45,29 @@ export default function Dashboard() {
 
   useEffect(() => {
     async function load() {
-      const [allTests, submissions, created, edited] = await Promise.all([
-        listTests(),
-        listRecentSubmissions(30),
-        listRecentlyCreatedTests(10),
-        listRecentlyEditedTests(10),
-      ]);
-      setTests(allTests);
-      setRecentSubmissions(submissions);
-      setRecentCreated(created);
-      setRecentEdited(edited);
+      const sources = [
+        { label: 'tests', fn: () => listTests(), set: setTests },
+        { label: 'recent submissions', fn: () => listRecentSubmissions(30), set: setRecentSubmissions },
+        { label: 'recently created tests', fn: () => listRecentlyCreatedTests(10), set: setRecentCreated },
+        { label: 'recently edited tests', fn: () => listRecentlyEditedTests(10), set: setRecentEdited },
+      ];
+      const results = await Promise.allSettled(sources.map((s) => s.fn()));
+
+      results.forEach((result, i) => {
+        const { label, set } = sources[i];
+        if (result.status === 'fulfilled') {
+          set(result.value);
+        } else {
+          const err = result.reason;
+          console.error(`Failed to load ${label}:`, err);
+          toast.warning(`Failed to load ${label}${err?.code ? ` (${err.code})` : ''}.`);
+        }
+      });
+
       setLoading(false);
     }
     load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const metrics = useMemo(() => {

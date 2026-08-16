@@ -76,7 +76,7 @@ export default function StartTest() {
       return;
     }
 
-    if (!isUserAllowed(test.allowedUsers, name, studentId)) {
+    if (!isUserAllowed(test.allowedUsers, test.restrictAccess, name, studentId)) {
       setBeginError("You're not on the approved list for this test. Check your name and Student ID, or contact your instructor.");
       return;
     }

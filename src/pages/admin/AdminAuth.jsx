@@ -25,6 +25,12 @@ export default function AdminAuth() {
         return;
       }
 
+      // Dashboard (the default landing page) fires several Firestore reads
+      // the instant it mounts - force a fresh token now so the Firestore
+      // client has a fully-attached credential before those reads go out,
+      // instead of racing the SDK's own post-sign-in token handshake.
+      await user.getIdToken(true);
+
       navigate(searchParams.get('redirect') || '/admin');
     } catch {
       setError('Incorrect email or password.');

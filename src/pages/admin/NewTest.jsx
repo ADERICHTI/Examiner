@@ -107,6 +107,7 @@ export default function NewTest() {
         minutes: Number(minutes),
         questions: validRows.map((r) => ({ question: r.question, options: r.options, answer: r.answer })),
         allowedUsers: restrictAccess ? validAllowedRows.map((r) => ({ name: r.name, studentId: r.studentId })) : [],
+        restrictAccess,
         strictMode,
         createdBy: user.email,
       });

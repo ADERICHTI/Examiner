@@ -72,8 +72,8 @@ export function submissionsToCsv(submissions) {
   return Papa.unparse(submissions);
 }
 
-export function downloadCsv(filename, csvContent) {
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+function downloadFile(filename, content, mimeType) {
+  const blob = new Blob([content], { type: mimeType });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
@@ -82,6 +82,14 @@ export function downloadCsv(filename, csvContent) {
   a.click();
   a.remove();
   URL.revokeObjectURL(url);
+}
+
+export function downloadCsv(filename, csvContent) {
+  downloadFile(filename, csvContent, 'text/csv;charset=utf-8;');
+}
+
+export function downloadJson(filename, data) {
+  downloadFile(filename, JSON.stringify(data, null, 2), 'application/json;charset=utf-8;');
 }
 
 export async function copyToClipboard(text) {
@@ -114,11 +122,21 @@ export async function parseAllowedUsersFile(file) {
   return parsed.data.map((row, i) => normalizeAllowedUser(row, i));
 }
 
+export function allowedUsersToCsv(allowedUsers) {
+  return Papa.unparse((allowedUsers ?? []).map((u) => ({ name: u.name, studentId: u.studentId })));
+}
+
 // Both name and student id must match the same allowed-list entry - trimmed,
 // case-insensitive, so small formatting differences don't lock a student out.
-export function isUserAllowed(allowedUsers, name, studentId) {
-  if (!allowedUsers?.length) return true;
+//
+// restrictAccess is the explicit on/off toggle, kept independent of the list
+// itself so an admin can flip enforcement off without losing an uploaded
+// list. Older tests never wrote that field, so fall back to "non-empty list
+// means restricted" for them.
+export function isUserAllowed(allowedUsers, restrictAccess, name, studentId) {
+  const restricted = restrictAccess ?? Boolean(allowedUsers?.length);
+  if (!restricted) return true;
   const n = name.trim().toLowerCase();
   const s = studentId.trim().toLowerCase();
-  return allowedUsers.some((u) => u.name.trim().toLowerCase() === n && u.studentId.trim().toLowerCase() === s);
+  return (allowedUsers ?? []).some((u) => u.name.trim().toLowerCase() === n && u.studentId.trim().toLowerCase() === s);
 }

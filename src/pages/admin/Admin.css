@@ -88,6 +88,27 @@
     }
 }
 
+/* Mobile-only topbar controls: hamburger button + the dropdown it opens.
+   Defined here (not via Tailwind's min-[481px]: variant) because Tailwind's
+   CDN-injected styles and this Vite-bundled stylesheet fight for cascade
+   order at equal specificity - keeping the toggle in one file makes it
+   deterministic. .admin-topbar-actions is the desktop/tablet inline
+   refresh+email+sign-out group; it's the mirror image of these two. */
+.admin-hamburger-btn {
+    display: flex;
+}
+.admin-topbar-actions {
+    display: none;
+}
+@media (min-width: 481px) {
+    .admin-hamburger-btn {
+        display: none;
+    }
+    .admin-topbar-actions {
+        display: flex;
+    }
+}
+
 /* Mobile hamburger dropdown: Dashboard / Tests / Refresh / Sign out */
 .admin-mobile-menu {
     position: absolute;
@@ -101,6 +122,11 @@
     background: var(--gm-surface);
     box-shadow: var(--gm-shadow-soft);
     border-top: 1px solid var(--gm-outline);
+}
+@media (min-width: 481px) {
+    .admin-mobile-menu {
+        display: none;
+    }
 }
 .admin-mobile-menu button.admin-nav-link {
     width: 100%;

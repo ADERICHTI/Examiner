@@ -27,7 +27,7 @@ export default function AdminLayout() {
           <i className="fa-solid fa-graduation-cap text-blue-600"></i> Examiner Admin
         </div>
 
-        <div className="hidden min-[481px]:flex items-center gap-3">
+        <div className="admin-topbar-actions items-center gap-3">
           <button
             type="button"
             onClick={handleRefresh}
@@ -50,7 +50,7 @@ export default function AdminLayout() {
         <button
           type="button"
           onClick={() => setMenuOpen((open) => !open)}
-          className="admin-icon-btn min-[481px]:hidden"
+          className="admin-icon-btn admin-hamburger-btn"
           aria-label="Menu"
           aria-expanded={menuOpen}
         >
@@ -58,7 +58,7 @@ export default function AdminLayout() {
         </button>
 
         {menuOpen && (
-          <nav className="admin-mobile-menu min-[481px]:hidden">
+          <nav className="admin-mobile-menu">
             {NAV_ITEMS.map((item) => (
               <NavLink
                 key={item.to}

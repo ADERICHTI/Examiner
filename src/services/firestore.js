@@ -55,7 +55,7 @@ export async function listTests() {
   return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
 }
 
-export async function createTest({ adminEnteredId, displayName, minutes, questions, allowedUsers, strictMode, createdBy }) {
+export async function createTest({ adminEnteredId, displayName, minutes, questions, allowedUsers, restrictAccess, strictMode, createdBy }) {
   // Collision-checked id: admin-entered id + random suffix, retried on the
   // (astronomically unlikely) chance of a collision.
   let testId;
@@ -74,9 +74,11 @@ export async function createTest({ adminEnteredId, displayName, minutes, questio
     displayName,
     minutes,
     questions,
-    // Empty/absent = open to anyone with the link; non-empty = only these
-    // name + student id pairs may start the test (checked in StartTest.jsx).
+    // Saved list of name + student id pairs; only enforced when restrictAccess
+    // is true (checked in StartTest.jsx). Kept even when restriction is off so
+    // an admin can re-enable it later without re-uploading.
     allowedUsers: allowedUsers ?? [],
+    restrictAccess: Boolean(restrictAccess),
     // Strict mode: no exit button, forces fullscreen, auto-submits if the
     // student navigates away or leaves fullscreen (enforced in TestInterface.jsx).
     strictMode: Boolean(strictMode),
@@ -92,12 +94,13 @@ export async function createTest({ adminEnteredId, displayName, minutes, questio
   return testId;
 }
 
-export async function updateTest(testId, { displayName, minutes, questions, allowedUsers, strictMode, active, updatedBy }) {
+export async function updateTest(testId, { displayName, minutes, questions, allowedUsers, restrictAccess, strictMode, active, updatedBy }) {
   const patch = { updatedAt: serverTimestamp(), updatedBy };
   if (displayName !== undefined) patch.displayName = displayName;
   if (minutes !== undefined) patch.minutes = minutes;
   if (questions !== undefined) patch.questions = questions;
   if (allowedUsers !== undefined) patch.allowedUsers = allowedUsers;
+  if (restrictAccess !== undefined) patch.restrictAccess = restrictAccess;
   if (strictMode !== undefined) patch.strictMode = strictMode;
   if (active !== undefined) patch.active = active;
   await updateDoc(doc(db, 'tests', testId), patch);

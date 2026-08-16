@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { getTest, updateTest } from '../../services/firestore';
-import { normalizeQuestion } from '../../services/csv';
+import { downloadCsv, downloadJson, normalizeQuestion, questionsToCsv } from '../../services/csv';
 import SpreadsheetTable from '../../components/SpreadsheetTable';
 
 function toRow(q, i) {
@@ -49,6 +49,14 @@ export default function QuestionsEditor() {
 
   const invalidCount = rows.filter((r) => !r.valid).length;
 
+  function handleDownloadCsv() {
+    downloadCsv(`${testId}-questions.csv`, questionsToCsv(rows));
+  }
+
+  function handleDownloadJson() {
+    downloadJson(`${testId}-questions.json`, rows.map((r) => ({ question: r.question, options: r.options, answer: r.answer })));
+  }
+
   async function handleSave() {
     if (invalidCount > 0) return;
     setSaving(true);
@@ -77,6 +85,12 @@ export default function QuestionsEditor() {
         <div className="flex items-center gap-3">
           {invalidCount > 0 && <span className="text-sm text-red-500 font-medium">{invalidCount} row(s) need fixing</span>}
           {saved && <span className="text-sm text-[#1E7E34] font-medium">Saved</span>}
+          <button onClick={handleDownloadCsv} disabled={rows.length === 0} className="gpill gpill-neutral disabled:opacity-50 disabled:cursor-not-allowed">
+            <i className="fa-solid fa-download"></i> CSV
+          </button>
+          <button onClick={handleDownloadJson} disabled={rows.length === 0} className="gpill gpill-neutral disabled:opacity-50 disabled:cursor-not-allowed">
+            <i className="fa-solid fa-download"></i> JSON
+          </button>
           <button onClick={handleAddRow} className="gpill gpill-neutral">
             <i className="fa-solid fa-plus"></i> Add Question
           </button>
