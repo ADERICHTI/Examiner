@@ -39,7 +39,14 @@ export default function Submission() {
   const alreadyTaken = reason === 'already-taken';
 
   return (
-    <div id="page-submitted" className="page active items-center justify-center text-center">
+    <div id="page-submitted" className="page active items-center justify-center text-center relative">
+      <div className="absolute top-6 left-6 flex items-center gap-2 text-left lg:hidden">
+        <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600 text-sm">
+          <i className="fa-solid fa-graduation-cap"></i>
+        </div>
+        <span className="text-sm font-bold tracking-tight text-slate-800">Examiner</span>
+      </div>
+
       <div className="max-w-sm">
         <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center text-green-600 text-5xl mx-auto mb-6 shadow-lg shadow-green-200">
           <i className="fa-solid fa-check"></i>

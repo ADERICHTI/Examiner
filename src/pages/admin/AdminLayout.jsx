@@ -13,6 +13,7 @@ const NAV_ITEMS = [
 export default function AdminLayout() {
   const { user } = useAuth();
   const [refreshing, setRefreshing] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   function handleRefresh() {
     setRefreshing(true);
@@ -25,19 +26,8 @@ export default function AdminLayout() {
         <div className="flex items-center gap-2 font-bold text-slate-800">
           <i className="fa-solid fa-graduation-cap text-blue-600"></i> Examiner Admin
         </div>
-        <nav className="admin-mobile-nav">
-          {NAV_ITEMS.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.end}
-              className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
-            >
-              <i className={item.icon}></i> {item.label}
-            </NavLink>
-          ))}
-        </nav>
-        <div className="flex items-center gap-3">
+
+        <div className="hidden min-[481px]:flex items-center gap-3">
           <button
             type="button"
             onClick={handleRefresh}
@@ -47,7 +37,7 @@ export default function AdminLayout() {
           >
             <i className={`fa-solid fa-arrows-rotate ${refreshing ? 'fa-spin' : ''}`}></i>
           </button>
-          <span className="text-xs text-slate-500 hidden sm:inline">{user?.email}</span>
+          <span className="text-xs text-slate-500">{user?.email}</span>
           <button
             type="button"
             onClick={() => signOut(auth)}
@@ -56,6 +46,48 @@ export default function AdminLayout() {
             <i className="fa-solid fa-right-from-bracket"></i> Sign out
           </button>
         </div>
+
+        <button
+          type="button"
+          onClick={() => setMenuOpen((open) => !open)}
+          className="admin-icon-btn min-[481px]:hidden"
+          aria-label="Menu"
+          aria-expanded={menuOpen}
+        >
+          <i className={`fa-solid ${menuOpen ? 'fa-xmark' : 'fa-bars'}`}></i>
+        </button>
+
+        {menuOpen && (
+          <nav className="admin-mobile-menu min-[481px]:hidden">
+            {NAV_ITEMS.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.end}
+                onClick={() => setMenuOpen(false)}
+                className={({ isActive }) => `admin-nav-link ${isActive ? 'active' : ''}`}
+              >
+                <i className={item.icon}></i> {item.label}
+              </NavLink>
+            ))}
+            <div className="admin-mobile-menu-divider" />
+            <button
+              type="button"
+              onClick={() => { setMenuOpen(false); handleRefresh(); }}
+              disabled={refreshing}
+              className="admin-nav-link"
+            >
+              <i className={`fa-solid fa-arrows-rotate ${refreshing ? 'fa-spin' : ''}`}></i> Refresh
+            </button>
+            <button
+              type="button"
+              onClick={() => signOut(auth)}
+              className="admin-nav-link"
+            >
+              <i className="fa-solid fa-right-from-bracket"></i> Sign out
+            </button>
+          </nav>
+        )}
       </header>
 
       <div className="admin-body">

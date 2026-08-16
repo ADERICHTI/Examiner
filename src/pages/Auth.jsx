@@ -37,7 +37,14 @@ export default function Auth() {
   }
 
   return (
-    <div id="page-login" className="page active items-center justify-center">
+    <div id="page-login" className="page active items-center justify-center relative">
+      <div className="absolute top-6 left-6 flex items-center gap-2 lg:hidden">
+        <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600 text-sm">
+          <i className="fa-solid fa-graduation-cap"></i>
+        </div>
+        <span className="text-sm font-bold tracking-tight text-slate-800">Examiner</span>
+      </div>
+
       <div className="flex-1 flex flex-col justify-center max-w-sm mx-auto w-full">
         <div className="mb-10 text-center">
           <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 text-2xl font-bold mx-auto mb-4 shadow-lg shadow-blue-50">

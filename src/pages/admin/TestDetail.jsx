@@ -46,6 +46,9 @@ export default function TestDetail() {
 
   const [copiedLabel, setCopiedLabel] = useState('');
 
+  const [accessOpen, setAccessOpen] = useState(true);
+  const [submissionsOpen, setSubmissionsOpen] = useState(true);
+
   const [accessEditing, setAccessEditing] = useState(false);
   const [allowedRows, setAllowedRows] = useState([]);
   const [accessSaving, setAccessSaving] = useState(false);
@@ -310,16 +313,23 @@ export default function TestDetail() {
 
       {/* Access restriction */}
       <div className="gcard mb-6">
-        <div className="flex items-center justify-between flex-wrap gap-3 mb-1">
-          <h2 className="text-lg font-medium text-[#1F1F1F]">Access Restriction</h2>
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={() => setAccessOpen((open) => !open)}
+            className="flex items-center gap-2 text-left"
+          >
+            <i className={`fa-solid fa-chevron-right text-xs text-[#444746] transition-transform ${accessOpen ? 'rotate-90' : ''}`}></i>
+            <h2 className="text-lg font-medium text-[#1F1F1F]">Access Restriction</h2>
+          </button>
           {!accessEditing && (
-            <button onClick={() => setAccessEditing(true)} className="gpill gpill-neutral">
+            <button onClick={() => { setAccessOpen(true); setAccessEditing(true); }} className="gpill gpill-neutral">
               <i className="fa-solid fa-pen"></i> Edit
             </button>
           )}
         </div>
 
-        {!accessEditing ? (
+        {accessOpen && (!accessEditing ? (
           <>
             <p className="text-sm text-[#444746] mt-1">
               {test.allowedUsers?.length ? (
@@ -381,35 +391,44 @@ export default function TestDetail() {
               </button>
             </div>
           </div>
-        )}
+        ))}
       </div>
 
       {/* Submissions */}
       <div className="gcard">
         <div className="flex items-center justify-between flex-wrap gap-3 mb-4">
-          <h2 className="text-lg font-medium text-[#1F1F1F]">Submissions</h2>
-          <div className="flex items-center gap-2 flex-wrap">
-            <input
-              className="input-field !py-1.5 !w-40 text-sm"
-              placeholder="Search…"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-            <label className="flex items-center gap-1.5 text-xs text-[#444746]">
-              <input type="checkbox" checked={submittedOnly} onChange={(e) => setSubmittedOnly(e.target.checked)} />
-              Submitted only
-            </label>
-            <div className="flex rounded-full bg-[#F1F3F4] p-1">
-              <button onClick={() => setView('list')} className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${view === 'list' ? 'bg-white text-[#1F1F1F] shadow-sm' : 'text-[#444746]'}`}>List</button>
-              <button onClick={() => setView('spreadsheet')} className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${view === 'spreadsheet' ? 'bg-white text-[#1F1F1F] shadow-sm' : 'text-[#444746]'}`}>Spreadsheet</button>
+          <button
+            type="button"
+            onClick={() => setSubmissionsOpen((open) => !open)}
+            className="flex items-center gap-2 text-left"
+          >
+            <i className={`fa-solid fa-chevron-right text-xs text-[#444746] transition-transform ${submissionsOpen ? 'rotate-90' : ''}`}></i>
+            <h2 className="text-lg font-medium text-[#1F1F1F]">Submissions</h2>
+          </button>
+          {submissionsOpen && (
+            <div className="flex items-center gap-2 flex-wrap">
+              <input
+                className="input-field !py-1.5 !w-40 text-sm"
+                placeholder="Search…"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+              <label className="flex items-center gap-1.5 text-xs text-[#444746]">
+                <input type="checkbox" checked={submittedOnly} onChange={(e) => setSubmittedOnly(e.target.checked)} />
+                Submitted only
+              </label>
+              <div className="flex rounded-full bg-[#F1F3F4] p-1">
+                <button onClick={() => setView('list')} className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${view === 'list' ? 'bg-white text-[#1F1F1F] shadow-sm' : 'text-[#444746]'}`}>List</button>
+                <button onClick={() => setView('spreadsheet')} className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${view === 'spreadsheet' ? 'bg-white text-[#1F1F1F] shadow-sm' : 'text-[#444746]'}`}>Spreadsheet</button>
+              </div>
+              <button onClick={handleDownloadCsv} className="gpill gpill-neutral">
+                <i className="fa-solid fa-download"></i> CSV
+              </button>
             </div>
-            <button onClick={handleDownloadCsv} className="gpill gpill-neutral">
-              <i className="fa-solid fa-download"></i> CSV
-            </button>
-          </div>
+          )}
         </div>
 
-        {view === 'spreadsheet' ? (
+        {submissionsOpen && (view === 'spreadsheet' ? (
           <SpreadsheetTable
             columns={[
               { key: 'studentId', label: 'Student ID' },
@@ -446,7 +465,7 @@ export default function TestDetail() {
               </li>
             ))}
           </ul>
-        )}
+        ))}
       </div>
 
       {deleteSubmissionTarget && (
